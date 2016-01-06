@@ -1,10 +1,11 @@
 {
-    "name":"hyena",
-    "version":"0.0.1",
-    "private":false,
-    "dependencies":{
-    	"pomelo":"0.8.1",
-        "async": "*"
-    }
+  "name": "hyena",
+  "version": "0.0.1",
+  "private": false,
+  "dependencies": {
+    "async": "^1.5.1",
+    "crc": "^3.4.0",
+    "generic-pool": "^2.3.0",
+    "pomelo": "0.8.1"
+  }
 }
-

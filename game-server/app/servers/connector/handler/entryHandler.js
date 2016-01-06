@@ -1,3 +1,5 @@
+var async = require('async');
+
 module.exports = function(app) {
   return new Handler(app);
 };
@@ -15,5 +17,23 @@ var Handler = function(app) {
  * @return {Void}
  */
 Handler.prototype.entry = function(msg, session, next) {
-  next(null, {code: 200, msg: 'game server is ok.'});
+	//check username and password
+	async.series({
+		checkAccount: function(callback) {
+			
+		},
+		recordToOnline: function(callback) {
+
+		},
+		registToChat: function(callback) {
+
+		}
+	}, function(error, doc) {
+		if (error) {
+			next(null, {code: 201, msg: 'game server error.'});
+		} else {
+			next(null, {code: 200, msg: 'game server is ok.'});
+		}
+	})
+
 };
