@@ -1,15 +1,15 @@
 var exp = module.exports;
+var dispatcher = require('./dispatcher');
 
-exp.connector = function(session, msg, app, cb) {
-    if(!session) {
-        cb(new Error('fail to route to connector server for session is empty'));
-        return;
-    }
+exp.chat = function(session, msg, app, cb) {
+	var chatServers = app.getServersByType('chat');
 
-    if(!session.frontendId) {
-        cb(new Error('fail to find frontend id in session'));
-        return;
-    }
+	if(!chatServers || chatServers.length === 0) {
+		cb(new Error('can not find chat servers.'));
+		return;
+	}
 
-    cb(null, session.frontendId);
+	var res = dispatcher.dispatch(session.get('rid'), chatServers);
+
+	cb(null, res.id);
 };
