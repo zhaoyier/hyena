@@ -11,7 +11,7 @@ app.set('name', 'hyena');
 // app configure
 app.configure('production|development', function() {
     // route configures
-    app.route('chat', routeUtil.chat);
+    app.route('connector', routeUtil.connector);
 
     // filter configures
     app.filter(pomelo.timeout());
@@ -19,10 +19,10 @@ app.configure('production|development', function() {
 
 // Configure database
 app.configure('production|development', 'area|auth|connector|master', function() {
-    var dbclient = require('./app/dao/mysql/mysql').init(app);
-    app.set('dbclient', dbclient);
-    // app.load(pomelo.sync, {path:__dirname + '/app/dao/mapping', dbclient: dbclient});
-  app.use(sync, {sync: {path:__dirname + '/app/dao/mapping', dbclient: dbclient}});
+    //var dbclient = require('./app/dao/mysql/mysql').init(app);
+    //app.set('dbclient', dbclient);
+    //app.load(pomelo.sync, {path:__dirname + '/app/dao/mapping', dbclient: dbclient});
+    //app.use(sync, {sync: {path:__dirname + '/app/dao/mapping', dbclient: dbclient}});
 });
 
 // app configuration
