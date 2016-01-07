@@ -82,37 +82,16 @@ var addRecord = function(service, uid, name, sid, channelName) {
  * Remove records for the specified user and channel pair
  */
 var removeRecord = function(service, uid, channelName) {
-	delete service.channelMap[uid][channelName];
-	if(utils.size(service.channelMap[uid])) {
-		return;
-	}
-
-	// if user not in any channel then clear his records
-	clearRecords(service, uid);
 };
 
 /**
  * Clear all records of the user
  */
 var clearRecords = function(service, uid) {
-	delete service.channelMap[uid];
-
-	var record = service.uidMap[uid];
-	if(!record) {
-		return;
-	}
-
-	delete service.uidMap[uid];
-	delete service.nameMap[record.name];
 };
 
 /**
  * Get the connector server id assosiated with the uid
  */
 var getSidByUid = function(uid, app) {
-	var connector = dispatcher.dispatch(uid, app.getServersByType('connector'));
-	if(connector) {
-		return connector.id;
-	}
-	return null;
 };
