@@ -6,6 +6,15 @@ var routeUtil = require('./app/util/routeUtil');
 var app = pomelo.createApp();
 app.set('name', 'chatofpomelo-websocket');
 
+// app configure
+app.configure('production|development', function() {
+	// route configures
+	app.route('chat', routeUtil.chat);
+
+	// filter configures
+	app.filter(pomelo.timeout());
+});
+
 // app configuration
 app.configure('production|development', 'connector', function(){
 	app.set('connectorConfig',
@@ -25,14 +34,12 @@ app.configure('production|development', 'gate', function(){
 		});
 });
 
-// app configure
-app.configure('production|development', function() {
-	// route configures
-	app.route('chat', routeUtil.chat);
-
-	// filter configures
-	app.filter(pomelo.timeout());
-});
+app.configure('production|development', 'chat|connector|team', function() {
+    var dbclient = require('./app/dao/mongodb/mongodb').init(app, function(error, doc) {
+    	console.error('======>>>001:\t', error, doc);
+        if (error === null) app.set('dbclient', doc);
+    });
+})
 
 // start app
 app.start();
