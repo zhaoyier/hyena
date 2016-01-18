@@ -1,0 +1,1 @@
+[2015-12-25 14:49:06.472] [INFO] admin-log - [32m[/home/zhaojianwei/pomelo/chatofpomelo/game-server/node_modules/pomelo/lib/master/master.js] [39m{"action":"execute","moduleId":"__console__","method":"clientHandler","msg":{"signal":"list","clientId":"pomelo_list_1451026146252","username":"admin"}}

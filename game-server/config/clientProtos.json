@@ -1,0 +1,6 @@
+{
+	"connector.entryHandler.enter": {
+		"required string username": 1,
+		"required string rid": 2	
+	}	
+}
