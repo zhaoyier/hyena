@@ -28,6 +28,7 @@ handler.queryEntry = function(msg, session, next) {
 	}
 	// get all connectors
 	var connectors = this.app.getServersByType('connector');
+	console.log('=======>>>1002:\t', connectors, !connectors);
 	if(!connectors || connectors.length === 0) {
 		next(null, {
 			code: 500

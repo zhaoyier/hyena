@@ -11,7 +11,6 @@ var Handler = function(app) {
 var handler = Handler.prototype;
 
 handler.joinTeam = function(msg, session, next) {
-	console.log('=====>>>1001:\t');
 	teamManager.applyJoinTeam({}, function(error, doc) {
 		console.log('=====>>>1002:\t', error, doc);
 		return next(null, {code: 200, msg: 'ok'});

@@ -33,14 +33,13 @@ function Team(teamId){
 * */
 Team.prototype.addPlayer = function(data) {
 	//检查是否已满
-	console.log('=====>>3001:\t', data);
 	if (!this.isTeamHasPosition()) return 1;
 	//初始化卡牌数据
 	var _userCard = this.cardService.initCard(data.cardType);
 	//加入队伍
 	this.userDataArray.push({
 		userId: data.userId, 
-		//playerCard: _playerCard, 
+		playerCard: _userCard, 
 		cardType: data.cardType
 	});
 

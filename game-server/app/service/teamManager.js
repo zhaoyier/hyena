@@ -1,4 +1,7 @@
 var async = require('async');
+var pomelo = require('pomelo');
+
+var gameDao = require('../dao/game/gameDao');
 var Team = require('../domain/entity/team');
 
 var handler = module.exports;
@@ -14,13 +17,23 @@ handler.applyJoinTeam = function(data, callFunc) {
 		queryValidyTeam: function(callback) {
 			_validTeam = getHasPositionTeam();
 			if (!_validTeam) {
-				_validTeam = _self.createTeam();
+				_validTeam = new Team(++gTeamId);
 			}
 
 			return callback(null);
 		},
-		addToTeam: function(callback) {
+		temp: function(callback) {
+			pomelo.app.get('dbclient').game_user.findOne(function(error, doc) {
+				console.log('=====>>>1006:\t', error, doc);
+				return callback(null);
+			})
+		},
+		addPlayerToTeam: function(callback) {
 			_validTeam.addPlayer({});
+
+			if (!gTeamObjDict[_validTeam.teamId]) {
+				gTeamObjDict[_validTeam.teamId] = _validTeam;
+			}
 			return callback(null);
 		}
 	}, function(error, doc) {
