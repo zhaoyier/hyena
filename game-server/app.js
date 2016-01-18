@@ -15,6 +15,9 @@ app.configure('production|development', 'connector', function(){
 			//useDict : true,
 			//useProtobuf : true
 		});
+	require('./app/dao./mongodb/mongodb').init(app, function(error, doc) {
+		app.set('dbclient', doc);
+	})
 });
 
 app.configure('production|development', 'gate', function(){
