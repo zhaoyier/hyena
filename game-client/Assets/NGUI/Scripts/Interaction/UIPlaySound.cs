@@ -21,7 +21,6 @@ public class UIPlaySound : MonoBehaviour
 		OnRelease,
 		Custom,
 		OnEnable,
-		OnDisable,
 	}
 
 	public AudioClip audioClip;
@@ -45,12 +44,6 @@ public class UIPlaySound : MonoBehaviour
 	void OnEnable ()
 	{
 		if (trigger == Trigger.OnEnable)
-			NGUITools.PlaySound(audioClip, volume, pitch);
-	}
-
-	void OnDisable ()
-	{
-		if (trigger == Trigger.OnDisable)
 			NGUITools.PlaySound(audioClip, volume, pitch);
 	}
 

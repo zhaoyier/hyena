@@ -3,7 +3,7 @@
 // Copyright © 2011-2014 Tasharen Entertainment
 //----------------------------------------------
 
-#if !UNITY_3_5
+#if !UNITY_3_5 && !UNITY_FLASH
 #define DYNAMIC_FONT
 #endif
 
@@ -106,7 +106,6 @@ static public class NGUIText
 		{
 			dynamicFont.RequestCharactersInTexture(")_-", finalSize, fontStyle);
 
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
 			if (!dynamicFont.GetCharacterInfo(')', out mTempChar, finalSize, fontStyle) || mTempChar.vert.height == 0f)
 			{
 				dynamicFont.RequestCharactersInTexture("A", finalSize, fontStyle);
@@ -121,22 +120,6 @@ static public class NGUIText
 
 			float y0 = mTempChar.vert.yMax;
 			float y1 = mTempChar.vert.yMin;
-#else
-			if (!dynamicFont.GetCharacterInfo(')', out mTempChar, finalSize, fontStyle) || mTempChar.maxY == 0f)
-			{
-				dynamicFont.RequestCharactersInTexture("A", finalSize, fontStyle);
-				{
-					if (!dynamicFont.GetCharacterInfo('A', out mTempChar, finalSize, fontStyle))
-					{
-						baseline = 0f;
-						return;
-					}
-				}
-			}
-
-			float y0 = mTempChar.maxY;
-			float y1 = mTempChar.minY;
-#endif
 			baseline = Mathf.Round(y0 + (finalSize - y0 + y1) * 0.5f);
 		}
 #endif
@@ -171,32 +154,18 @@ static public class NGUIText
 	{
 		if (bitmapFont != null)
 		{
-			bool thinSpace = false;
-
-			if (ch == '\u2009')
-			{
-				thinSpace = true;
-				ch = ' ';
-			}
-
 			BMGlyph bmg = bitmapFont.bmFont.GetGlyph(ch);
 
 			if (bmg != null)
 			{
-				int adv = bmg.advance;
-				if (thinSpace) adv >>= 1;
-				return fontScale * ((prev != 0) ? adv + bmg.GetKerning(prev) : bmg.advance);
+				return fontScale * ((prev != 0) ? bmg.advance + bmg.GetKerning(prev) : bmg.advance);
 			}
 		}
 #if DYNAMIC_FONT
 		else if (dynamicFont != null)
 		{
 			if (dynamicFont.GetCharacterInfo((char)ch, out mTempChar, finalSize, fontStyle))
- #if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
 				return mTempChar.width * fontScale * pixelDensity;
- #else
-				return mTempChar.advance * fontScale * pixelDensity;
- #endif
 		}
 #endif
 		return 0f;
@@ -210,14 +179,6 @@ static public class NGUIText
 	{
 		if (bitmapFont != null)
 		{
-			bool thinSpace = false;
-
-			if (ch == '\u2009')
-			{
-				thinSpace = true;
-				ch = ' ';
-			}
-
 			BMGlyph bmg = bitmapFont.bmFont.GetGlyph(ch);
 
 			if (bmg != null)
@@ -235,9 +196,7 @@ static public class NGUIText
 				glyph.u1.x = bmg.x + bmg.width;
 				glyph.u1.y = bmg.y;
 
-				int adv = bmg.advance;
-				if (thinSpace) adv >>= 1;
-				glyph.advance = adv + kern;
+				glyph.advance = bmg.advance + kern;
 				glyph.channel = bmg.channel;
 				glyph.rotatedUVs = false;
 
@@ -255,7 +214,6 @@ static public class NGUIText
 		{
 			if (dynamicFont.GetCharacterInfo((char)ch, out mTempChar, finalSize, fontStyle))
 			{
- #if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
 				glyph.v0.x = mTempChar.vert.xMin;
 				glyph.v1.x = glyph.v0.x + mTempChar.vert.width;
 
@@ -271,20 +229,7 @@ static public class NGUIText
 				glyph.advance = mTempChar.width;
 				glyph.channel = 0;
 				glyph.rotatedUVs = mTempChar.flipped;
- #else
-				glyph.v0.x = mTempChar.minX;
-				glyph.v1.x = mTempChar.maxX;
 
-				glyph.v0.y = mTempChar.maxY - baseline;
-				glyph.v1.y = mTempChar.minY - baseline;
-
-				glyph.u0 = mTempChar.uvBottomLeft;
-				glyph.u1 = mTempChar.uvTopRight;
-
-				glyph.advance = mTempChar.advance;
-				glyph.channel = 0;
-				glyph.rotatedUVs = false;
- #endif
 				glyph.v0.x = Mathf.Round(glyph.v0.x);
 				glyph.v0.y = Mathf.Round(glyph.v0.y);
 				glyph.v1.x = Mathf.Round(glyph.v1.x);
@@ -418,28 +363,15 @@ static public class NGUIText
 		bool italic = false;
 		bool underline = false;
 		bool strikethrough = false;
-		bool ignoreColor = false;
-		return ParseSymbol(text, ref index, null, false, ref n, ref bold, ref italic, ref underline, ref strikethrough, ref ignoreColor);
+		return ParseSymbol(text, ref index, null, false, ref n, ref bold, ref italic, ref underline, ref strikethrough);
 	}
 
 	/// <summary>
-	/// Whether the specified character falls under the 'hex' character category (0-9, A-F).
-	/// </summary>
-
-	[System.Diagnostics.DebuggerHidden]
-	[System.Diagnostics.DebuggerStepThrough]
-	static public bool IsHex (char ch)
-	{
-		return (ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'f') || (ch >= 'A' && ch <= 'F');
-	}
-
-	/// <summary>
-	/// Parse the symbol, if possible. Returns 'true' if the 'index' was adjusted.
-	/// Advanced symbol support originally contributed by Rudy Pangestu.
+	/// Parse the symbol, if possible. Returns 'true' if the 'index' was adjusted. Advanced symbol support contributed by Rudy Pangestu.
 	/// </summary>
 
 	static public bool ParseSymbol (string text, ref int index, BetterList<Color> colors, bool premultiply,
-		ref int sub, ref bool bold, ref bool italic, ref bool underline, ref bool strike, ref bool ignoreColor)
+		ref int sub, ref bool bold, ref bool italic, ref bool underline, ref bool strike)
 	{
 		int length = text.Length;
 
@@ -478,11 +410,6 @@ static public class NGUIText
 				strike = true;
 				index += 3;
 				return true;
-
-				case "[c]":
-				ignoreColor = true;
-				index += 3;
-				return true;
 			}
 		}
 
@@ -514,25 +441,11 @@ static public class NGUIText
 				index += 4;
 				return true;
 
-				case "[/c]":
-				ignoreColor = false;
+				default:
+				int a = (NGUIMath.HexToDecimal(text[index + 1]) << 4) | NGUIMath.HexToDecimal(text[index + 2]);
+				mAlpha = a / 255f;
 				index += 4;
 				return true;
-
-				default:
-				{
-					char ch0 = text[index + 1];
-					char ch1 = text[index + 2];
-
-					if (IsHex(ch0) && IsHex(ch1))
-					{
-						int a = (NGUIMath.HexToDecimal(ch0) << 4) | NGUIMath.HexToDecimal(ch1);
-						mAlpha = a / 255f;
-						index += 4;
-						return true;
-					}
-				}
-				break;
 			}
 		}
 
@@ -655,10 +568,9 @@ static public class NGUIText
 					bool italic = false;
 					bool underline = false;
 					bool strikethrough = false;
-					bool ignoreColor = false;
 					int retVal = i;
 
-					if (ParseSymbol(text, ref retVal, null, false, ref sub, ref bold, ref italic, ref underline, ref strikethrough, ref ignoreColor))
+					if (ParseSymbol(text, ref retVal, null, false, ref sub, ref bold, ref italic, ref underline, ref strikethrough))
 					{
 						text = text.Remove(i, retVal - i);
 						imax = text.Length;
@@ -835,7 +747,7 @@ static public class NGUIText
 
 	[DebuggerHidden]
 	[DebuggerStepThrough]
-	static bool IsSpace (int ch) { return (ch == ' ' || ch == 0x200a || ch == 0x200b || ch == '\u2009'); }
+	static bool IsSpace (int ch) { return (ch == ' ' || ch == 0x200a || ch == 0x200b); }
 
 	/// <summary>
 	/// Convenience function that ends the line by either appending a new line character or replacing a space with one.
@@ -1205,7 +1117,6 @@ static public class NGUIText
 		bool italic = false;
 		bool underline = false;
 		bool strikethrough = false;
-		bool ignoreColor = false;
 		const float sizeShrinkage = 0.75f;
 
 		float v0x;
@@ -1252,21 +1163,10 @@ static public class NGUIText
 			}
 
 			// Color changing symbol
-			if (encoding && ParseSymbol(text, ref i, mColors, premultiply, ref subscriptMode, ref bold,
-				ref italic, ref underline, ref strikethrough, ref ignoreColor))
+			if (encoding && ParseSymbol(text, ref i, mColors, premultiply, ref subscriptMode, ref bold, ref italic, ref underline, ref strikethrough))
 			{
-				Color fc;
-
-				if (ignoreColor)
-				{
-					fc = mColors[mColors.size - 1];
-					fc.a *= mAlpha * tint.a;
-				}
-				else
-				{
-					fc = tint * mColors[mColors.size - 1];
-					fc.a *= mAlpha;
-				}
+				Color fc = tint * mColors[mColors.size - 1];
+				fc.a *= mAlpha;
 				uc = fc;
 
 				for (int b = 0, bmax = mColors.size - 2; b < bmax; ++b)
@@ -1642,8 +1542,8 @@ static public class NGUIText
 
 	static float[] mBoldOffset = new float[]
 	{
-		-0.25f, 0f, 0.25f, 0f,
-		0f, -0.25f, 0f, 0.25f
+		-0.5f, 0f, 0.5f, 0f,
+		0f, -0.5f, 0f, 0.5f
 	};
 
 	/// <summary>

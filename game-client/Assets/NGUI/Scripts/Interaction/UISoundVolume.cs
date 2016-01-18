@@ -14,11 +14,13 @@ using UnityEngine;
 [AddComponentMenu("NGUI/Interaction/Sound Volume")]
 public class UISoundVolume : MonoBehaviour
 {
+	UISlider mSlider;
+
 	void Awake ()
 	{
-		UISlider slider = GetComponent<UISlider>();
-		slider.value = NGUITools.soundVolume;
-		EventDelegate.Add(slider.onChange, OnChange);
+		mSlider = GetComponent<UISlider>();
+		mSlider.value = NGUITools.soundVolume;
+		EventDelegate.Add(mSlider.onChange, OnChange);
 	}
 
 	void OnChange ()

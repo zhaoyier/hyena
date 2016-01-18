@@ -1,6 +1,6 @@
 //----------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright 漏 2011-2014 Tasharen Entertainment
+// Copyright © 2011-2014 Tasharen Entertainment
 //----------------------------------------------
 
 using UnityEngine;
@@ -389,6 +389,9 @@ public abstract class UIRect : MonoBehaviour
 		}
 		if (mStarted) OnInit();
 		mUpdateFrame = -1;
+#if UNITY_EDITOR
+		OnValidate();
+#endif
 	}
 
 	/// <summary>

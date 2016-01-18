@@ -1,6 +1,6 @@
 //----------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright 漏 2011-2014 Tasharen Entertainment
+// Copyright © 2011-2014 Tasharen Entertainment
 //----------------------------------------------
 
 using UnityEngine;
@@ -109,7 +109,6 @@ static public class NGUITools
 			{
 				AudioSource source = mListener.GetComponent<AudioSource>();
 				if (source == null) source = mListener.gameObject.AddComponent<AudioSource>();
-				source.priority = 50;
 				source.pitch = pitch;
 				source.PlayOneShot(clip, volume);
 				return source;
@@ -211,7 +210,7 @@ static public class NGUITools
 		cam = Camera.main;
 		if (cam && (cam.cullingMask & layerMask) != 0) return cam;
 
-#if UNITY_4_3 || UNITY_FLASH
+#if UNITY_4_3
 		Camera[] cameras = NGUITools.FindActive<Camera>();
 		for (int i = 0, imax = cameras.Length; i < imax; ++i)
 #else
@@ -915,20 +914,7 @@ static public class NGUITools
 		widget.width = 100;
 		widget.height = 100;
 		widget.depth = depth;
-		return widget;
-	}
-
-	/// <summary>
-	/// Add a new widget of specified type.
-	/// </summary>
-
-	static public T AddWidget<T> (GameObject go, int depth) where T : UIWidget
-	{
-		// Create the widget and place it above other widgets
-		T widget = AddChild<T>(go);
-		widget.width = 100;
-		widget.height = 100;
-		widget.depth = depth;
+		widget.gameObject.layer = go.layer;
 		return widget;
 	}
 
@@ -971,9 +957,7 @@ static public class NGUITools
 	static public T FindInParents<T> (GameObject go) where T : Component
 	{
 		if (go == null) return null;
-		// Commented out because apparently it causes Unity 4.5.3 to lag horribly:
-		// http://www.tasharen.com/forum/index.php?topic=10882.0
-//#if UNITY_4_3
+#if UNITY_4_3
  #if UNITY_FLASH
 		object comp = go.GetComponent<T>();
  #else
@@ -994,9 +978,9 @@ static public class NGUITools
  #else
 		return comp;
  #endif
-//#else
-//		return go.GetComponentInParent<T>();
-//#endif
+#else
+		return go.GetComponentInParent<T>();
+#endif
 	}
 
 	/// <summary>

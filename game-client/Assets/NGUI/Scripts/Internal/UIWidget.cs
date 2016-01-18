@@ -1,6 +1,6 @@
 //----------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright 漏 2011-2014 Tasharen Entertainment
+// Copyright © 2011-2014 Tasharen Entertainment
 //----------------------------------------------
 
 using UnityEngine;
@@ -70,16 +70,10 @@ public class UIWidget : UIRect
 		}
 		set
 		{
-#if UNITY_FLASH
-			if (!(mOnRender == value))
-#else
 			if (mOnRender != value)
-#endif
 			{
-#if !UNITY_FLASH
 				if (drawCall != null && drawCall.onRender != null && mOnRender != null)
 					drawCall.onRender -= mOnRender;
-#endif
 				mOnRender = value;
 				if (drawCall != null) drawCall.onRender += value;
 			}
