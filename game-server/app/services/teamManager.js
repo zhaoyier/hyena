@@ -22,6 +22,7 @@ var gTeamId = 0;
 * */
 handler.applyJoinTeam = function(data, func) {
 	var _teamObject, _self = this, _userBasic;
+
 	async.series({
 		addToTeam: function(callback) {
 			_teamObject = getHasPositionTeam() || new Team(++gTeamId);
@@ -34,21 +35,27 @@ handler.applyJoinTeam = function(data, func) {
 			}
 
 			return callback(null);
-		},
-		initUserCard: function(callback) {
-			GameDao.queryCardData(function(error, doc) {
-				if (error) return callback(202);	//todo: 
-
-				_teamObject.initPlayerCard({userId: data.userId, cardType: UtilFunc.getUserCardType(doc)});
-				return callback(null);
-			})
-		}	
+		}
 	}, function(error, doc) {
 		if (error) {
 			return func(ServerStatus.COMMON_ERROR);
 		} else {
 			return func(ServerStatus.OK);
 		}
+	})
+}
+
+handler.applyStartGame = function(data, func) {
+	async.series({
+		updateTeamStatus: function(callback) {
+			return callback(null);
+		},
+		pushMessageToTeam: function(callback) {
+			//通知所有队友开始
+			return callback(null);
+		},
+	}, function(error, doc) {
+
 	})
 }
 

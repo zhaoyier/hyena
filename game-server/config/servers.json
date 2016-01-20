@@ -12,6 +12,9 @@
 	    ],
         "game":[
             {"id":"game-server-1", "host":"10.96.36.181", "port":8050}
+        ],
+        "manager":[
+            {"id":"manager-server-1", "host":"10.96.36.181", "port":8060}
         ]
     },
     "production":{
@@ -27,6 +30,9 @@
         ],
         "game":[
             {"id":"game-server-1", "host":"10.96.36.181", "port":8050}
+        ],
+        "manager":[
+            {"id":"manager-server-1", "host":"10.96.36.181", "port":8060}
         ]
   }
 }

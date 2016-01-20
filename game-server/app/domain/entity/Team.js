@@ -11,20 +11,6 @@ function Team(teamId, teamType){
 	this.teamMemberArray = new Array();
 	this.channel = this.createChannel(teamId);
 	this.team = {teamId: teamId, teamType: teamType};
-	
-	// var _this = this;
-	// var init = function() {
-	// 	for (var i=0; i<MAX_MEMBER_NUM; ++i) {
-	// 		_this.userDataArray.push({
-	// 			userId: consts.Team.PLAYER_ID_NONE,
-	// 			userCard: new Array(),
-	// 			cardType: consts.Card.NONE,
-	// 			userDevice: consts.Device.DEVICE_NONE,
-	// 		})
-	// 	}
-	// }
-
-	// init();
 }
 /* *
 * args: {userId, cardType, deviceId, serverId}
@@ -48,10 +34,10 @@ Team.prototype.addPlayer = function(data) {
 	this.teamMemberArray.push({
 		userId: data.userId,
 		userBasic: {name: 'admin', gold: 99, diamond: 99, avatar: '001'},	//todo
-		userCard: new Array(), 
-		cardType: 0,
+		userCard: {hand: new Array(), type: 0, status: 0/*出牌状态*/},
 		userDevice: data.deviceId,
-		userServer: data.serverId
+		userServer: data.serverId,
+		teamStatus: {status: 0, timestamp: 0}
 	});
 
 	//todo: 同步队友
@@ -72,8 +58,23 @@ Team.prototype.initPlayerCard = function(data) {
 	}
 }
 
+/* *
+* param: 
+* */
+Team.prototype.updateMemeberStatus = function(data) {
+	var _self = this;
+	for (var i in _self.teamMemberArray) {
+		if (_self.teamMemberArray[i].userId == data.userId) continue;
+
+		_self.teamMemberArray[i].userCard.status = data.cardStatus;
+	}
+}
+
+/* *
+* param: {status: }
+* */
 Team.prototype.updateTeamStatus = function(data) {
-	this.teamStatus = data.status;
+	this.teamStatus = {status: data.status, timestamp: Date.now()/1000|0};
 }
 
 Team.prototype.createChannel = function(teamId) {
@@ -100,19 +101,6 @@ Team.prototype.addPlayer2Channel = function(data) {
 	}
 
 	return false;
-}
-
-Team.prototype.updateTeamInfo = function() {
-	var _infoObjDict = {};
-	var _arr = this.userDataArray;
-	for (var i in _arr) {
-		var _userId = _arr[i].userId;
-		_infoObjDict[_userId] = _arr[i].userBasic;
-	}
-
-	if (Object.keys(_infoObjDict).length > 0) {
-		this.channel.pushMessage('onUpdateTeam', _infoObjDict, null);
-	}
 }
 
 Team.prototype.removePlayerFromChannel = function(data) {
@@ -147,6 +135,79 @@ Team.prototype.isPlayerInTeam = function(userId) {
 	return false;
 }
 
+//解散
+Team.prototype.disbandTeam = function() {
+
+}
+
+Team.prototype.removePlayer = function(userId, cb) {
+
+}
+
+Team.prototype. = function(data, callfunc) {
+
+}
+
+/*
+onBasicTeam: 1,
+onStartTeam: 2,
+onBetTeam: 3,
+onRaiseTeam: 4,
+onCheckTeam: 5,
+onCompareTeam: 6,
+onClearTeam: 7,
+onLeaveTeam: 99,
+*/
+
+//新进万家, 通知基本信息
+Team.prototype.pushUserMsg2All = function() {
+	var _infoObjDict = {};
+	var _arr = this.userDataArray;
+	for (var i in _arr) {
+		var _userId = _arr[i].userId;
+		_infoObjDict[_userId] = _arr[i].userBasic;
+	}
+
+	if (Object.keys(_infoObjDict).length > 0) {
+		this.channel.pushMessage('onBasicTeam', _infoObjDict, null);
+	}
+}
+
+//通知开始
+Team.prototype.pushStartMsg2All = function(data, callfunc) {
+
+}
+
+//通知XX
+Team.prototype.pushBetMsg2All = function(data, callfunc) {
+
+}
+
+//通知
+Team.prototype.pushRaiseMsg2All = function(data, callfunc) {
+
+}
+
+//通知
+Team.prototype.pushCheckMsg2All = function(data, callfunc) {
+
+}
+
+//通知
+Team.prototype.pushCompareMsg2All = function(data, callfunc) {
+
+}
+
+//通知
+Team.prototype.pushClearMsg2All = function(data, callfunc) {
+
+}
+
+//通知聊天
+Team.prototype.pushChatMsg2All = function(data, callfunc) {
+
+}
+
 Team.prototype.pushLeaveMsg2All = function(userId, callback) {
 	var _ret = {};
 	if (!this.channel) {
@@ -159,22 +220,10 @@ Team.prototype.pushLeaveMsg2All = function(userId, callback) {
 	})
 }
 
-//解散
-Team.prototype.disbandTeam = function() {
-
-}
-
-Team.prototype.removePlayer = function(userId, cb) {
-
-}
-
 Team.prototype.pushChatMsg2All = function(content) {
 
 }
 
-Team.prototype.updateMemberInfo = function(data) {
-
-}
 
 ///////////////////////////////////////////////////////
 /**

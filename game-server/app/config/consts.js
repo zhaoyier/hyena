@@ -21,6 +21,13 @@ module.exports = {
 		ZHADAN: 6	
 	},
 	GameStatus: {
+		None: 0,
+		Wait: 1,
+		Process: 2,
+		Clear: 3
+	},
+	Game: {
+		None: 0,
 		Bet: 1,
 		Raise: 2,
 		Fold: 3,
