@@ -21,16 +21,16 @@ var gTeamId = 0;
 * @api public
 * */
 handler.applyJoinTeam = function(data, func) {
-	var _validTeam, _self = this, _userBasic;
+	var _teamObject, _self = this, _userBasic;
 	async.series({
 		addToTeam: function(callback) {
-			_validTeam = getHasPositionTeam() || new Team(++gTeamId);
-			if (!_validTeam) return callback(201);
+			_teamObject = getHasPositionTeam() || new Team(++gTeamId);
+			if (!_teamObject) return callback(201);
 
-			if (_validTeam.addPlayer(data)) return callback(201);
+			if (_teamObject.addPlayer(data)) return callback(201);
 
-			if (!gTeamObjDict[_validTeam.teamId]) {
-				gTeamObjDict[_validTeam.teamId] = _validTeam;
+			if (!gTeamObjDict[_teamObject.teamId]) {
+				gTeamObjDict[_teamObject.teamId] = _teamObject;
 			}
 
 			return callback(null);
@@ -39,10 +39,10 @@ handler.applyJoinTeam = function(data, func) {
 			GameDao.queryCardData(function(error, doc) {
 				if (error) return callback(202);	//todo: 
 
-				_validTeam.initPlayerCard({userId: data.userId, cardType: UtilFunc.getUserCardType(doc)});
+				_teamObject.initPlayerCard({userId: data.userId, cardType: UtilFunc.getUserCardType(doc)});
 				return callback(null);
 			})
-		}		
+		}	
 	}, function(error, doc) {
 		if (error) {
 			return func(ServerStatus.COMMON_ERROR);
@@ -52,14 +52,41 @@ handler.applyJoinTeam = function(data, func) {
 	})
 }
 
-handler.applyBet = function(data, callfunc) {
-	return callfunc(null);
+handler.applyChangeTeam = function(data, func) {
+	var _currentTeamId = data.teamId;
+	async.series({
+		exitCurrentTeam: function(callback) {
+			return callback(null);
+		},
+		addToTeam: function(callback) {
+			return callback(null);
+		},
+		initUserCard: function(callback) {
+			return callback(null);
+		}
+	}, function(error, doc) {
+		return func(null);
+	})
+	//退出之前的team
+	//判断有没有空闲的team
+	//判断
 }
 
-handler.applyRaise = function(data, callfunc) {
-	return callfunc(null);
+handler.applyCheckCard = function(data, func) {
+	return func(null);
 }
 
+handler.applyBet = function(data, func) {
+	return func(null);
+}
+
+handler.applyRaise = function(data, func) {
+	return func(null);
+}
+
+handler.applyLeave = function(data, func) {
+
+}
 
 function getHasPositionTeam() {
 	for (var i in gTeamObjDict) {

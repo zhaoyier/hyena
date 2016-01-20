@@ -11,13 +11,19 @@ var Handler = function(app) {
 var handler = Handler.prototype;
 
 handler.joinTeam = function(msg, session, next) {
-	teamManager.applyJoinTeam(msg, function(error, doc) {
+	// teamManager.applyJoinTeam(msg, function(error, doc) {
+	// 	return next(null, {code: 200, msg: 'ok'});
+	// })
+
+	this.app.rpc.manager.teamRemote.applyJoinTeam(session, msg, function(error, doc) {
 		return next(null, {code: 200, msg: 'ok'});
 	})
 }
 
 handler.changeTeam = function(msg, session, next) {
-
+	teamManager.applyChangeTeam(msg, function(error, doc) {
+		return next(null, {code: 200, msg: 'ok'});
+	})
 }
 
 handler.processTeam = function (msg, session, next) {
@@ -36,5 +42,9 @@ handler.exitTeam = function(msg, session, next) {
 }
 
 handler.clearGame = function (msg, session, next) {
+
+}
+
+handler.heartTeam = function(msg, session, next) {
 
 }

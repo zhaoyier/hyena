@@ -6,6 +6,7 @@ var consts = require('../../config/consts');
 var MAX_MEMBER_NUM = 3;
 
 function Team(teamId, teamType){
+	this.teamStatus = 0;
 	this.cardService = new Card();
 	this.teamMemberArray = new Array();
 	this.channel = this.createChannel(teamId);
@@ -43,17 +44,18 @@ Team.prototype.addPlayer = function(data) {
 	if (this.isPlayerInTeam(data.userId)) return false;
 	//加入频道
 	if (!this.addPlayer2Channel(data)) return false;
-	
-	//初始化卡牌数据
-	//var _userCard = this.cardService.initCard(data.cardType);
 	//加入队伍
 	this.teamMemberArray.push({
-		userId: data.userId, 
+		userId: data.userId,
+		userBasic: {name: 'admin', gold: 99, diamond: 99, avatar: '001'},	//todo
 		userCard: new Array(), 
 		cardType: 0,
 		userDevice: data.deviceId,
 		userServer: data.serverId
 	});
+
+	//todo: 同步队友
+	this.updateTeamInfo();
 
 	return true;
 }
@@ -68,6 +70,10 @@ Team.prototype.initPlayerCard = function(data) {
 		_self.teamMemberArray[i].userCard = _userCard;
 		_self.teamMemberArray[i].cardType = data.cardType;
 	}
+}
+
+Team.prototype.updateTeamStatus = function(data) {
+	this.teamStatus = data.status;
 }
 
 Team.prototype.createChannel = function(teamId) {
@@ -97,11 +103,26 @@ Team.prototype.addPlayer2Channel = function(data) {
 }
 
 Team.prototype.updateTeamInfo = function() {
-	
+	var _infoObjDict = {};
+	var _arr = this.userDataArray;
+	for (var i in _arr) {
+		var _userId = _arr[i].userId;
+		_infoObjDict[_userId] = _arr[i].userBasic;
+	}
+
+	if (Object.keys(_infoObjDict).length > 0) {
+		this.channel.pushMessage('onUpdateTeam', _infoObjDict, null);
+	}
 }
 
 Team.prototype.removePlayerFromChannel = function(data) {
+	if (!this.channel) return false;
 
+	if (data) {
+		this.channel.leave(data.userId, data.serverId);
+		return true;
+	}
+	return false;
 }
 
 Team.prototype.getPlayerNum = function() {
@@ -126,12 +147,16 @@ Team.prototype.isPlayerInTeam = function(userId) {
 	return false;
 }
 
-Team.prototype.updateTeamInfo = function() {
+Team.prototype.pushLeaveMsg2All = function(userId, callback) {
+	var _ret = {};
+	if (!this.channel) {
+		return callback(null, _ret);
+	}
 
-}
-
-Team.prototype.pushLeaveMsg2All = function(userId, cb) {
-
+	var _msg = {userId: userId};
+	this.channel.pushMessage('onTeammateLeaveTeam', _msg, function(error, doc) {
+		return callback(null, ret);
+	})
 }
 
 //解散
