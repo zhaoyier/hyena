@@ -11,8 +11,30 @@ var Handler = function(app) {
 var handler = Handler.prototype;
 
 handler.joinTeam = function(msg, session, next) {
-	teamManager.applyJoinTeam({}, function(error, doc) {
-		console.log('=====>>>1002:\t', error, doc);
+	teamManager.applyJoinTeam(msg, function(error, doc) {
 		return next(null, {code: 200, msg: 'ok'});
 	})
+}
+
+handler.changeTeam = function(msg, session, next) {
+
+}
+
+handler.processTeam = function (msg, session, next) {
+	var _gameCode = msg.gameCode;
+	if (_gameCode == 1) {
+
+	} else if (_gameCode == 2) {
+
+	} else {
+
+	}
+}
+
+handler.exitTeam = function(msg, session, next) {
+
+}
+
+handler.clearGame = function (msg, session, next) {
+
 }

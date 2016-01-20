@@ -24,6 +24,13 @@ sqlclient.init = function(app, cb) {
 function getGameDBCollections(url, collections, cb) {
 	MongoClient.connect(url, function(error, db) {
 		async.series({
+			account_info: function(callback) {
+				db.collection('account_info', function(error, coll){
+					if (!error) collections.game_user = coll;
+
+					return callback(null);
+				})
+			},
 			game_user: function(callback) {
 				db.collection('game_user', function(error, coll){
 					if (!error) collections.game_user = coll;

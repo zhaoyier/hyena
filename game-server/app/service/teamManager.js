@@ -1,8 +1,13 @@
 var async = require('async');
 var pomelo = require('pomelo');
 
-var gameDao = require('../dao/game/gameDao');
+
+var GameDao = require('../dao/game/gameDao');
 var Team = require('../domain/entity/team');
+var UtilFunc = require('../util/utilFunc');
+var ServerStatus = require('../config/consts').ServerStatus;
+
+var server_resp_hash = require('../config/server_resp_hash').data;
 
 var handler = module.exports;
 
@@ -11,39 +16,48 @@ var gTeamObjDict = {};
 // global team id
 var gTeamId = 0;
 
-handler.applyJoinTeam = function(data, callFunc) {
-	var _validTeam, _self = this;
+/* *
+* @param: data {} 
+* @api public
+* */
+handler.applyJoinTeam = function(data, func) {
+	var _validTeam, _self = this, _userBasic;
 	async.series({
-		queryValidyTeam: function(callback) {
-			_validTeam = getHasPositionTeam();
-			if (!_validTeam) {
-				_validTeam = new Team(++gTeamId);
-			}
+		addToTeam: function(callback) {
+			_validTeam = getHasPositionTeam() || new Team(++gTeamId);
+			if (!_validTeam) return callback(201);
 
-			return callback(null);
-		},
-		temp: function(callback) {
-			pomelo.app.get('dbclient').game_user.findOne(function(error, doc) {
-				console.log('=====>>>1006:\t', error, doc);
-				return callback(null);
-			})
-		},
-		addPlayerToTeam: function(callback) {
-			_validTeam.addPlayer({});
+			if (_validTeam.addPlayer(data)) return callback(201);
 
 			if (!gTeamObjDict[_validTeam.teamId]) {
 				gTeamObjDict[_validTeam.teamId] = _validTeam;
 			}
+
 			return callback(null);
-		}
+		},
+		initUserCard: function(callback) {
+			GameDao.queryCardData(function(error, doc) {
+				if (error) return callback(202);	//todo: 
+
+				_validTeam.initPlayerCard({userId: data.userId, cardType: UtilFunc.getUserCardType(doc)});
+				return callback(null);
+			})
+		}		
 	}, function(error, doc) {
-		return callFunc(null, null);
+		if (error) {
+			return func(ServerStatus.COMMON_ERROR);
+		} else {
+			return func(ServerStatus.OK);
+		}
 	})
 }
 
-handler.createTeam = function(data) {
-	var _newTeam = new Team(++gTeamId);
-	return _newTeam;
+handler.applyBet = function(data, callfunc) {
+	return callfunc(null);
+}
+
+handler.applyRaise = function(data, callfunc) {
+	return callfunc(null);
 }
 
 
