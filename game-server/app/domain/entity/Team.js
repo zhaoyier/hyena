@@ -41,9 +41,10 @@ Team.prototype.addPlayer = function(data) {
 	});
 
 	//todo: 同步队友
-	this.updateTeamInfo();
-
-	return true;
+	//this.updateTeamInfo();
+	this.pushUserMsg2All(function(error, doc) {
+		return true;
+	});
 }
 
 Team.prototype.initPlayerCard = function(data) {
@@ -165,7 +166,7 @@ Team.prototype.pushStartMsg2All = function(data, callfunc) {
 		_self.teamState.timestamp = Date.now()/1000|0;
 
 		if (_self.userDataArray.length >= 2) {
-			_self.pushMessage('onStartTeam', {})
+			_self.pushMessage('onStartTeam', {});
 		}
 	}
 }
@@ -216,6 +217,17 @@ Team.prototype.pushChatMsg2All = function(content) {
 
 }
 
+function findNext(userList, currentId) {
+	var _tail = userList.slice(-1);
+	if (_tail.userId = currentId) {
+		return userList[0];
+	} else {
+		for (var i in userList) {
+			if (userList[i].userId) return userList[(parseInt(i)+1)];
+		}
+	}
+	return null;
+}
 
 ///////////////////////////////////////////////////////
 /**

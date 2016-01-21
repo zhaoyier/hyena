@@ -21,14 +21,35 @@ TeamRemote.prototype.applyStartGame = function(data, callfunc) {
 	})
 }
 
-// TeamRemote.prototype.updateMemberInfo = function(args, callback){
 
-// }
+TeamRemote.prototype.applyBetGame = function(data, callfunc) {
 
-// TeamRemote.prototype.chatInTeam = function(args, callback){
+}
 
-// }
+TeamRemote.prototype.applyRaiseGame = function(data, callfunc) {
+	
+}
 
-// TeamRemote.prototype.applyLeaveTeam = function(arg, callback) {
+TeamRemote.prototype.applyCheckGame = function(data, callfunc) {
+	
+}
 
-// }
+TeamRemote.prototype.applyAbandonGame = function(data, callfunc) {
+	
+}
+
+TeamRemote.prototype.applyLeaveGame = function(data, callfunc) {
+	
+}
+
+TeamRemote.prototype.applyCompareGame = function(data, callfunc) {
+	
+}
+
+TeamRemote.prototype.applyClearGame = function(data, callfunc) {
+	
+}
+
+TeamRemote.prototype.applyChangeGame = function(data, callfunc) {
+	
+}

@@ -25,7 +25,7 @@ handler.applyJoinTeam = function(data, func) {
 
 	async.series({
 		addToTeam: function(callback) {
-			_teamObject = getHasPositionTeam() || new Team(++gTeamId);
+			_teamObject = getHasPositionTeam(data.teamType) || new Team(++gTeamId);
 			if (!_teamObject) return callback(201);
 
 			if (_teamObject.addPlayer(data)) return callback(201);
@@ -59,7 +59,35 @@ handler.applyStartGame = function(data, func) {
 	})
 }
 
-handler.applyChangeTeam = function(data, func) {
+handler.applyBetGame = function(data, callfunc) {
+	return callfunc(null);
+}
+
+handler.applyRaiseGame = function(data, callfunc) {
+	return callfunc(null);
+}
+
+handler.applyCheckGame = function(data, callfunc) {
+	return callfunc(null);
+}
+
+handler.applyAbandonGame = function(data, callfunc) {
+	return callfunc(null);
+}
+
+handler.applyLeaveGame = function(data, callfunc) {
+	return callfunc(null);
+}
+
+handler.applyCompareGame = function(data, callfunc) {
+	return callfunc(null);
+}
+
+handler.applyClearGame = function(data, callfunc) {
+	return callfunc(null);
+}
+
+handler.applyChangeGame = function(data, callfunc) {
 	var _currentTeamId = data.teamId;
 	async.series({
 		exitCurrentTeam: function(callback) {
@@ -74,30 +102,11 @@ handler.applyChangeTeam = function(data, func) {
 	}, function(error, doc) {
 		return func(null);
 	})
-	//退出之前的team
-	//判断有没有空闲的team
-	//判断
 }
 
-handler.applyCheckCard = function(data, func) {
-	return func(null);
-}
-
-handler.applyBet = function(data, func) {
-	return func(null);
-}
-
-handler.applyRaise = function(data, func) {
-	return func(null);
-}
-
-handler.applyLeave = function(data, func) {
-
-}
-
-function getHasPositionTeam() {
+function getHasPositionTeam(teamType) {
 	for (var i in gTeamObjDict) {
-		if (gTeamObjDict[i].isTeamHasPosition()) return gTeamObjDict[i];
+		if (gTeamObjDict[i].isTeamHasPosition() && gTeamObjDict[i].team.teamType == teamType) return gTeamObjDict[i];
 	}
 
 	return null;

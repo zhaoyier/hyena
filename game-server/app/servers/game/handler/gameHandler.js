@@ -1,3 +1,4 @@
+var utilFunc = require('../../../util/utilFunc');
 var teamManager = require('../../../service/teamManager');
 
 module.exports = function(app) {
@@ -11,6 +12,7 @@ var Handler = function(app) {
 var handler = Handler.prototype;
 
 handler.joinTeam = function(msg, session, next) {
+	var _userBasic = {userId: 1, username: 'admin'};
 	this.app.rpc.manager.teamRemote.applyJoinTeam(session, msg, function(error, doc) {
 		return next(null, {code: 200, msg: 'ok'});
 	})
@@ -23,23 +25,49 @@ handler.startTeam = function(msg, session, next) {
 }
 
 handler.betTeam = function (msg, session, next) {
-	
+	this.app.rpc.manager.teamRemote.applyBetGame(session, msg, function(error, doc) {
+		return next(null, {code: 200, msg: 'ok'});
+	})
 }
 
 handler.raiseTeam = function (msg, session, next) {
-
+	this.app.rpc.manager.teamRemote.applyRaiseGame(session, msg, function(error, doc) {
+		return next(null, {code: 200, msg: 'ok'});
+	})
 }
 
-handler.exitTeam = function(msg, session, next) {
-
+handler.checkTeam = function (msg, session, next) {
+	this.app.rpc.manager.teamRemote.applyCheckGame(session, msg, function(error, doc) {
+		return next(null, {code: 200, msg: 'ok'});
+	})
 }
 
-handler.clearGame = function (msg, session, next) {
+handler.abandonTeam =function (msg, session, next) {
+	this.app.rpc.manager.teamRemote.applyAbandonGame(session, msg, function(error, doc) {
+		return next(null, {code: 200, msg: 'ok'});
+	})
+}
 
+handler.leaveTeam = function(msg, session, next) {
+	this.app.rpc.manager.teamRemote.applyLeaveGame(session, msg, function(error, doc) {
+		return next(null, {code: 200, msg: 'ok'});
+	})
+}
+
+handler.compareTeam = function(msg, session, next) {
+	this.app.rpc.manager.teamRemote.applyCompareGame(session, msg, function(error, doc) {
+		return next(null, {code: 200, msg: 'ok'});
+	})
+}
+
+handler.clearTeam = function (msg, session, next) {
+	this.app.rpc.manager.teamRemote.applyClearGame(session, msg, function(error, doc) {
+		return next(null, {code: 200, msg: 'ok'});
+	})
 }
 
 handler.changeTeam = function(msg, session, next) {
-	teamManager.applyChangeTeam(msg, function(error, doc) {
+	this.app.rpc.manager.teamRemote.applyChangeGame(session, msg, function(error, doc) {
 		return next(null, {code: 200, msg: 'ok'});
 	})
 }

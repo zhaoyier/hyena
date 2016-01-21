@@ -6,7 +6,7 @@ var consts = require('../../config/consts');
 var MAX_MEMBER_NUM = 3;
 
 function Team(teamId, teamType){
-	this.teamStatus = 0;
+	this.teamState = 0;
 	this.cardService = new Card();
 	this.teamMemberArray = new Array();
 	this.channel = this.createChannel(teamId);
@@ -34,16 +34,17 @@ Team.prototype.addPlayer = function(data) {
 	this.teamMemberArray.push({
 		userId: data.userId,
 		userBasic: {name: 'admin', gold: 99, diamond: 99, avatar: '001'},	//todo
-		userCard: {hand: new Array(), type: 0, status: 0/*出牌状态*/},
+		userCard: {hand: new Array(), type: 0, state: 0/*出牌状态*/},
 		userDevice: data.deviceId,
 		userServer: data.serverId,
-		teamStatus: {status: 0, timestamp: 0}
+		teamStatus: {state: 0, timestamp: 0}
 	});
 
 	//todo: 同步队友
-	this.updateTeamInfo();
-
-	return true;
+	//this.updateTeamInfo();
+	this.pushUserMsg2All(function(error, doc) {
+		return true;
+	});
 }
 
 Team.prototype.initPlayerCard = function(data) {
@@ -73,8 +74,8 @@ Team.prototype.updateMemeberStatus = function(data) {
 /* *
 * param: {status: }
 * */
-Team.prototype.updateTeamStatus = function(data) {
-	this.teamStatus = {status: data.status, timestamp: Date.now()/1000|0};
+Team.prototype.updateTeamState = function(data) {
+	this.teamState = {status: data.status, timestamp: Date.now()/1000|0};
 }
 
 Team.prototype.createChannel = function(teamId) {
@@ -144,38 +145,30 @@ Team.prototype.removePlayer = function(userId, cb) {
 
 }
 
-Team.prototype. = function(data, callfunc) {
-
-}
-
-/*
-onBasicTeam: 1,
-onStartTeam: 2,
-onBetTeam: 3,
-onRaiseTeam: 4,
-onCheckTeam: 5,
-onCompareTeam: 6,
-onClearTeam: 7,
-onLeaveTeam: 99,
-*/
-
 //新进万家, 通知基本信息
-Team.prototype.pushUserMsg2All = function() {
-	var _infoObjDict = {};
-	var _arr = this.userDataArray;
-	for (var i in _arr) {
-		var _userId = _arr[i].userId;
-		_infoObjDict[_userId] = _arr[i].userBasic;
+Team.prototype.pushUserMsg2All = function(callfunc) {
+	var _userBasicObject = {}, _self = this;
+	for (var i in _self.userDataArray) {
+		_userBasicObject[_self.userDataArray[i].userId] = _self.userDataArray[i].userBasic;
 	}
 
-	if (Object.keys(_infoObjDict).length > 0) {
-		this.channel.pushMessage('onBasicTeam', _infoObjDict, null);
+	if (Object.keys(_userBasicObject).length > 0) {
+		_self.channel.pushMessage('onBasicTeam', _userBasicObject, callfunc);
 	}
 }
 
 //通知开始
 Team.prototype.pushStartMsg2All = function(data, callfunc) {
+	var _self = this;
+	//todo: 判断和修改游戏状态
+	if (_self.teamState.state == 0) {
+		_self.teamState.state == 1;
+		_self.teamState.timestamp = Date.now()/1000|0;
 
+		if (_self.userDataArray.length >= 2) {
+			_self.pushMessage('onStartTeam', {});
+		}
+	}
 }
 
 //通知XX
@@ -224,6 +217,17 @@ Team.prototype.pushChatMsg2All = function(content) {
 
 }
 
+function findNext(userList, currentId) {
+	var _tail = userList.slice(-1);
+	if (_tail.userId = currentId) {
+		return userList[0];
+	} else {
+		for (var i in userList) {
+			if (userList[i].userId) return userList[(parseInt(i)+1)];
+		}
+	}
+	return null;
+}
 
 ///////////////////////////////////////////////////////
 /**
