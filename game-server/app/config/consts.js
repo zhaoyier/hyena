@@ -23,8 +23,9 @@ module.exports = {
 	GameStatus: {
 		None: 0,
 		Wait: 1,
-		Process: 2,
-		Clear: 3
+		Start: 2,
+		Process: 3,
+		Clear: 4
 	},
 	Game: {
 		None: 0,

@@ -6,7 +6,7 @@ var consts = require('../../config/consts');
 var MAX_MEMBER_NUM = 3;
 
 function Team(teamId, teamType){
-	this.teamState = 0;
+	this.teamState = {state: 0, timestamp: 0};
 	this.cardService = new Card();
 	this.teamMemberArray = new Array();
 	this.channel = this.createChannel(teamId);
@@ -37,11 +37,10 @@ Team.prototype.addPlayer = function(data) {
 		userCard: {hand: new Array(), type: 0, state: 0/*出牌状态*/},
 		userDevice: data.deviceId,
 		userServer: data.serverId,
-		teamStatus: {state: 0, timestamp: 0}
+		//teamStatus: {state: 0, timestamp: 0}
 	});
 
 	//todo: 同步队友
-	//this.updateTeamInfo();
 	this.pushUserMsg2All(function(error, doc) {
 		return true;
 	});
@@ -58,6 +57,92 @@ Team.prototype.initPlayerCard = function(data) {
 		_self.teamMemberArray[i].cardType = data.cardType;
 	}
 }
+
+Team.prototype.startTeamGame = function(data, callfunc) {
+	var _self = this;
+	
+	if (_self.teamState.state == 0) {
+		//更新游戏状态
+		_self.teamState.state == consts.GameStatus.Start;
+		_self.teamState.timestamp = Date.now()/1000|0;
+
+		//通知所有玩家
+		if (_self.userDataArray.length >= 2) {
+			_self.channel.pushMessage('onStartTeam', {state: consts.GameStatus.Start}, callfunc);
+		}
+	} else {
+		return callfunc(null);
+	}
+}
+
+Team.prototype.betGame = function(data, callfunc) {
+	//修改状态，通知
+
+	if (this.userDataArray.length >= 2) {
+		this.channel.pushMessage('onBetTeam', {}, callfunc);
+	}
+
+	return callfunc(null);
+}
+
+Team.prototype.raiseGame = function(data, callfunc) {
+	//修改状态，通知
+	if (this.userDataArray.length >= 2) {
+		this.channel.pushMessage('onRaiseTeam', {}, callfunc);
+	}
+
+	return callfunc(null);
+}
+
+Team.prototype.checkGame = function(data, callfunc) {
+	//修改状态，通知
+	if (this.userDataArray.length >= 2) {
+		this.channel.pushMessage('onCheckTeam', {}, callfunc);
+	}
+
+	return callfunc(null);
+}
+
+Team.prototype.abandonGame = function(data, callfunc) {
+	//修改状态，通知
+	if (this.userDataArray.length >= 2) {
+		this.channel.pushMessage('onAbandonTeam', {}, callfunc);
+	}
+
+	return callfunc(null);
+}
+
+Team.prototype.leaveGame = function(data, callfunc) {
+	//修改状态，通知
+	if (this.userDataArray.length >= 2) {
+		this.channel.pushMessage('onLeaveTeam', {}, callfunc);
+	}
+
+	return callfunc(null);
+}
+
+Team.prototype.compareGame = function(data, callfunc) {
+	//修改状态，通知
+	if (this.userDataArray.length >= 2) {
+		this.channel.pushMessage('onCompareTeam', {}, callfunc);
+	}
+
+	return callfunc(null);
+}
+
+Team.prototype.clearGame = function(data, callfunc) {
+	//修改状态，通知
+	if (this.userDataArray.length >= 2) {
+		this.channel.pushMessage('onCompareTeam', {}, callfunc);
+	}
+
+	return callfunc(null);
+}
+
+/************************************End********************************************/
+
+
+
 
 /* *
 * param: 

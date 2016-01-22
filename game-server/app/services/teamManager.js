@@ -20,7 +20,7 @@ var gTeamId = 0;
 * @param: data {} 
 * @api public
 * */
-handler.applyJoinTeam = function(data, func) {
+handler.applyJoinTeam = function(data, callfunc) {
 	var _teamObject, _self = this, _userBasic;
 
 	async.series({
@@ -38,24 +38,17 @@ handler.applyJoinTeam = function(data, func) {
 		}
 	}, function(error, doc) {
 		if (error) {
-			return func(ServerStatus.COMMON_ERROR);
+			return callfunc(ServerStatus.COMMON_ERROR);
 		} else {
-			return func(ServerStatus.OK);
+			return callfunc(ServerStatus.OK);
 		}
 	})
 }
 
-handler.applyStartGame = function(data, func) {
-	async.series({
-		updateTeamStatus: function(callback) {
-			return callback(null);
-		},
-		pushMessageToTeam: function(callback) {
-			//通知所有队友开始
-			return callback(null);
-		},
-	}, function(error, doc) {
-
+handler.applyStartGame = function(data, callfunc) {
+	var _teamObject = gTeamObjDict[data.teamId];
+	_teamObject.startTeamGame(data, function(error, doc) {
+		return callfunc(null);
 	})
 }
 
@@ -102,6 +95,10 @@ handler.applyChangeGame = function(data, callfunc) {
 	}, function(error, doc) {
 		return func(null);
 	})
+}
+
+function getTeamObjectById (teamId) {
+	return null;
 }
 
 function getHasPositionTeam(teamType) {
