@@ -1,4 +1,11 @@
 module.exports = {
+	GameStatus: {
+		None: 0,
+		Wait: 1,
+		Start: 2,
+		Process: 3,
+		Clear: 4
+	},//以上有使用	
 	Team: {
 		PLAYER_ID_NONE: 0,
 		A: 1,
@@ -19,14 +26,7 @@ module.exports = {
 		JINHUA: 4, 
 		SHUNJIN: 5, 
 		ZHADAN: 6	
-	},
-	GameStatus: {
-		None: 0,
-		Wait: 1,
-		Start: 2,
-		Process: 3,
-		Clear: 4
-	},
+	},	
 	Game: {
 		None: 0,
 		Bet: 1,

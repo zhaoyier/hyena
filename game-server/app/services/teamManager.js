@@ -3,7 +3,7 @@ var pomelo = require('pomelo');
 
 
 var GameDao = require('../dao/game/gameDao');
-var Team = require('../domain/entity/team');
+var Team = require('../domain/entity/Team');
 var UtilFunc = require('../util/utilFunc');
 var ServerStatus = require('../config/consts').ServerStatus;
 

@@ -286,3 +286,7 @@ var isExist = function(list, card) {
 
 	return false;
 }
+
+function test() {
+	return "tst";
+}

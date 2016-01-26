@@ -1,4 +1,4 @@
-var Card = require('./card');
+var Card = require('./Card');
 var pomelo = require('pomelo');
 var consts = require('../../config/consts');
 
@@ -6,9 +6,9 @@ var consts = require('../../config/consts');
 var MAX_MEMBER_NUM = 3;
 
 function Team(teamId, teamType){
-	this.teamState = {state: 0, timestamp: 0};
 	this.cardService = new Card();
 	this.teamMemberArray = new Array();
+	this.teamState = {state: consts.GameStatus.None, timestamp: 0};	//记录游戏状态
 	this.channel = this.createChannel(teamId);
 	this.team = {teamId: teamId, teamType: teamType};
 }
@@ -66,6 +66,9 @@ Team.prototype.startTeamGame = function(data, callfunc) {
 		//更新游戏状态
 		_self.teamState.state == consts.GameStatus.Start;
 		_self.teamState.timestamp = Date.now()/1000|0;
+
+		//删选结构，发送消息
+
 
 		//通知所有玩家
 		if (_self.userDataArray.length >= 2) {
@@ -301,6 +304,10 @@ Team.prototype.pushLeaveMsg2All = function(userId, callback) {
 
 Team.prototype.pushChatMsg2All = function(content) {
 
+}
+
+function test() {
+	return "tst";
 }
 
 function findNext(userList, currentId) {
