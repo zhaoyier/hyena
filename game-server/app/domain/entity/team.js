@@ -34,9 +34,10 @@ Team.prototype.addPlayer = function(data) {
 	this.teamMemberArray.push({
 		userId: data.userId,
 		userBasic: {name: 'admin', gold: 99, diamond: 99, avatar: '001'},	//todo
-		userCard: {hand: new Array(), type: 0, state: 0/*出牌状态*/},
+		userCard: {hand: new Array(), type: 0, state: 0/*出牌状态*/, lastHeart: Date.now()},
 		userDevice: data.deviceId,
 		userServer: data.serverId,
+		//lastHeart: 0;	//timestamp
 		//teamStatus: {state: 0, timestamp: 0}
 	});
 
