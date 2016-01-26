@@ -2,11 +2,11 @@ var async = require('async');
 
 //var utilFunc = require('./UtilityFunction');
 
-module.exports = card;
+module.exports = Card;
 
 CARD_SCALE = 16;
 
-function card() {
+function Card() {
 	this.colorNum = 4;
 	this.cardColor = {HEART:1, SPADE: 2, CLUB: 3, DIAMOND: 4};
 	this.cardType = {DAN: 1, DUI: 2, SHUN: 3, JIN: 4, SJ: 5, ZD: 6};
@@ -19,7 +19,7 @@ function card() {
 /**
 * function: 初始化卡牌
 * */
-card.prototype.initCard = function(cardType) {
+Card.prototype.initCard = function(cardType) {
 	var _cardColor, _self = this;
 
 	if (!cardType) cardType = 2;
@@ -54,12 +54,12 @@ card.prototype.initCard = function(cardType) {
 }
 
 //选择一种花色
-card.prototype.selectOneColor = function() {
+Card.prototype.selectOneColor = function() {
 	var _random = (Math.random()*this.colorNum|0)+1;
 	return [_random, _random, _random]
 }
 //选择两种花色
-card.prototype.selectTwoColor = function() {
+Card.prototype.selectTwoColor = function() {
 	while (true) {
 		var _random1 = parseInt((Math.random()*this.colorNum|0)+1);
 		var _random2 = parseInt((Math.random()*this.colorNum|0)+1);
@@ -72,7 +72,7 @@ card.prototype.selectTwoColor = function() {
 	}
 }
 //选择三种花色
-card.prototype.selectThreeColor = function() {
+Card.prototype.selectThreeColor = function() {
 	var _tempColor = [1, 2, 3, 4];
 	_tempColor.splice((Math.random()*this.colorNum|0), 1);
 	return _tempColor;

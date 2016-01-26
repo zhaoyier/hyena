@@ -267,7 +267,7 @@ Team.prototype.pushRaiseMsg2All = function(data, callfunc) {
 
 }
 
-//通知
+//通知AA
 Team.prototype.pushCheckMsg2All = function(data, callfunc) {
 
 }
