@@ -1,12 +1,13 @@
+var temp = require('./entity/Temp').User;
 var arg = process.argv.slice(2);
 
 
 main();
 
 function main() {
-	var temp = [5,7,9,11];
-	var _rtn = next(temp, parseInt(arg[0]));
-	console.log('====>>:\t', arg[0], _rtn);
+	var user = new temp({username: 'admin', userId: 1});
+	console.log('=====>>:\t', user);
+
 }
 
 function next(temp, value) {

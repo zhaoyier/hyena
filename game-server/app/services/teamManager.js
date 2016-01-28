@@ -5,6 +5,7 @@ var pomelo = require('pomelo');
 var GameDao = require('../dao/game/gameDao');
 var Team = require('../domain/entity/Team');
 var UtilFunc = require('../util/utilFunc');
+var consts = require('../config/consts');
 var ServerStatus = require('../config/consts').ServerStatus;
 
 var server_resp_hash = require('../config/server_resp_hash').data;
@@ -16,19 +17,29 @@ var gTeamObjDict = {};
 // global team id
 var gTeamId = 0;
 
+var ACTIVE_USER_TIME = 100;
+
 /* *
 * @param: data {} 
 * @api public
 * */
 handler.applyJoinTeam = function(data, callfunc) {
-	var _teamObject, _self = this, _userBasic;
+	var _teamObject = null, _teamId = 0;
 
 	async.series({
-		addToTeam: function(callback) {
-			_teamObject = getHasPositionTeam(data.teamType) || new Team(++gTeamId);
-			if (!_teamObject) return callback(201);
+		checkArgs: function(callback) {
+			if (data.teamType !=  consts.TeamType.Gold && data.teamType != consts.TeamType.Diamond) return callback('error team type');
 
-			if (_teamObject.addPlayer(data)) return callback(201);
+			return callback(null);
+		},
+		addToTeam: function(callback) {
+			_teamObject = getHasPositionTeam(data.teamType) || new Team(++gTeamId, data.teamType);
+			if (!_teamObject) return callback('create team error');
+
+			if (_teamObject.addPlayer(data)) return callback('add player error');
+
+			var _teamBasic = _teamObject.getTeamBasicInfo();
+			_teamId = _teamBasic.teamId;
 
 			if (!gTeamObjDict[_teamObject.teamId]) {
 				gTeamObjDict[_teamObject.teamId] = _teamObject;
@@ -38,22 +49,87 @@ handler.applyJoinTeam = function(data, callfunc) {
 		}
 	}, function(error, doc) {
 		if (error) {
-			return callfunc(ServerStatus.COMMON_ERROR);
+			return callfunc(error, doc);
 		} else {
-			return callfunc(ServerStatus.OK);
+			return callfunc(error, doc);
 		}
 	})
 }
 
 handler.applyStartGame = function(data, callfunc) {
-	var _teamObject = gTeamObjDict[data.teamId];
-	_teamObject.startTeamGame(data, function(error, doc) {
-		return callfunc(null);
+	var _teamObject = null, _rtnData = [];
+	async.series({
+		queryTeamObj: function(callback) {
+			_teamObject = gTeamObjDict[data.teamId];
+			if (!_teamObject) return callback('error team id');
+
+			return callback(null);
+		},
+		initCardBasic: function(callback) {
+			var _nowTimestamp = Date.now()/1000|0;
+			var _teamMember = _teamObject.getTeamMemberList();
+			if (_teamMember.length < 2) return callback('team member less limit');
+
+			for (var i in _teamMember) {
+				if ((_nowTimestamp - _teamMember[i].userBasic.lastHeart) >= ACTIVE_USER_TIME) _teamMember[i].userBasic.state = consts.UserState.Offline;
+
+				if (_teamMember[i].userBasic.state == consts.UserState.None 
+					|| _teamMember[i].userBasic.state == consts.UserState.Progress) {
+ 					//初始化
+ 					_teamMember[i].userCard.handCard = new Array();
+ 					_teamMember[i].userCard.cardType = consts.CardType.None;
+ 					_teamMember[i].userCard.cardState = consts.CardState.None;
+				} else {
+					_teamMember.splice(i, 1);
+				}
+			}
+
+			return callback(null);
+		},
+		filterData: function(callback) {
+			//筛选数据
+			var _teamMember = _teamObject.getTeamMemberList();
+			if (_teamMember.length < 2) return callback('team member less limit');
+
+			for (var i in _teamMember) {
+				_rtnData.push({userId: _teamMember[i].userId});
+			}
+
+			return callback(null);
+		},
+		pushMessage: function(callback) {
+			_teamObject.pushStartMsg2All(_rtnData, callback);
+		}
+	}, function(error, doc) {
+		if (error) {
+			return callfunc(error, doc);
+		} else {
+			return callfunc(error, doc);
+		}
 	})
 }
 
 handler.applyBetGame = function(data, callfunc) {
-	return callfunc(null);
+	var _teamObject = null, _rtnData = [];
+	async.series({
+		queryTeamObj: function(callback) {
+			_teamObject = gTeamObjDict[data.teamId];
+			if (!_teamObject) return callback('error team id');
+
+			return callback(null);
+		},
+		checkTeamMember: function(callback) {
+			return callback(null);
+		},
+		updateUserBalance: function(callback) {
+			return callback(null);
+		},
+		pushMessage: function(callback) {
+			return callback(null);
+		}
+	}, function(error, doc) {
+		return callfunc(error, doc);
+	})
 }
 
 handler.applyRaiseGame = function(data, callfunc) {
