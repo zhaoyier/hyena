@@ -7,9 +7,10 @@ module.exports = {
 		Clear: 4
 	}, UserState: {
 		None: 0,
-		Progress: 1,
-		Offline: 2,
-		Leave: 3
+		Observer: 1,
+		Progress: 2,
+		Offline: 3,
+		Leave: 4
 	}, CardType: {
 		None: 0,
 		DANPAI: 1, 

@@ -1,5 +1,5 @@
 var async = require('async');
-var userDao = require('../../../dao/game/userDao');
+var userDao = require('../../../dao/user/userDao');
 
 module.exports = function(app) {
 	return new Handler(app);
@@ -20,6 +20,8 @@ var handler = Handler.prototype;
  * @return {Void}
  */
 handler.login = function(msg, session, next) {
+	var _self = this;
+	
 	async.series({
 		checkUserToken: function(callback) {
 			return callback(null);
@@ -36,11 +38,12 @@ handler.login = function(msg, session, next) {
 			session.set('serverId', msg.serverId); //todo: client上传或重新计算
             session.set('username', msg.username);
             session.set('userId', 101); //todo: 查询数据库返回
-            session.on('closed', onUserLeave.bind(null, self.app));
+            session.on('closed', onUserLeave.bind(null, _self.app));
             session.pushAll(callback);
 		},
 		syncToChat: function(callback) {
-			// self.app.rpc.chat.chatRemote.add(session, player.userId, player.name,
+			console.log("=======>>>10001:\t", session.get('userId'));
+			// _self.app.rpc.chat.chatRemote.add(session, player.userId, player.name,
 			// 	channelUtil.getGlobalChannelName(), callback);
 			return callback(null);
 		}
@@ -50,7 +53,8 @@ handler.login = function(msg, session, next) {
 			return ;
 		}
 
-		next(null, {code: 200, user});
+		//next(null, {code: 200, user});
+		next(null, {code: 200});
 	})
 }
 

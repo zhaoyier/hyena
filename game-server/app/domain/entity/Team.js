@@ -37,27 +37,16 @@ Team.prototype.addPlayer = function(data) {
 	//加入队伍
 	this.teamMemberArray.push({
 		userId: data.userId,
-		userBasic: {name: 'admin', gold: 99, diamond: 99, avatar: '001', state: consts.UserState.None, lastHeart: Date.now(), server: data.serverId, device: data.device},	//todo
-		userCard: {handCard: new Array(), cardType: 0, cardState: consts.CardState.None/*出牌状态*/, bet: 0},
+		//userBasic: {name: 'admin', gold: 99, diamond: 99, avatar: '001', state: consts.UserState.None, lastHeart: Date.now(), server: data.serverId, device: data.device},	//todo
+		userBasic: {state: consts.UserState.None, lastHeart: Date.now()/1000|0, gold: 100, diamond: 100, bet: 0},
+		userCard: {handCard: new Array(), cardType: 0, cardState: consts.CardState.None/*出牌状态*/},
 	});
 
 	//todo: 同步队友
-	this.pushUserMsg2All(function(error, doc) {
-		return true;
-	});
+	// this.pushUserMsg2All(function(error, doc) {
+	// 	return true;
+	// });
 }
-
-// Team.prototype.initPlayerCard = function(data) {
-// 	var _self = this;
-// 	var _userCard = _self.cardService.initCard(data.cardType);
-
-// 	for (var i in _self.teamMemberArray) {
-// 		if (_self.teamMemberArray[i].userId == data.userId) continue;
-
-// 		_self.teamMemberArray[i].userCard = _userCard;
-// 		_self.teamMemberArray[i].cardType = data.cardType;
-// 	}
-// }
 
 Team.prototype.updateTeamMemberBasic = function(data) {
 	for (var i in this.teamMemberArray) {
@@ -79,7 +68,7 @@ Team.prototype.updateTeamMemberBet = function() {
 	} else if (this.teamBasic.teamType == consts.TeamType.Diamond) {
 
 	} else {
-		
+
 	}
 }
 

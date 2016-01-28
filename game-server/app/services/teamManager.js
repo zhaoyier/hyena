@@ -46,6 +46,9 @@ handler.applyJoinTeam = function(data, callfunc) {
 			}
 
 			return callback(null);
+		},
+		pushMessage: function(callback) {
+			return callback(null);
 		}
 	}, function(error, doc) {
 		if (error) {
@@ -87,7 +90,7 @@ handler.applyStartGame = function(data, callfunc) {
 			return callback(null);
 		},
 		filterData: function(callback) {
-			//筛选数据
+			//筛选数据, 金额
 			var _teamMember = _teamObject.getTeamMemberList();
 			if (_teamMember.length < 2) return callback('team member less limit');
 
@@ -110,7 +113,9 @@ handler.applyStartGame = function(data, callfunc) {
 }
 
 handler.applyBetGame = function(data, callfunc) {
-	var _teamObject = null, _rtnData = [];
+	var _teamObject = null, _rtnData = [], _gameState = consts.GameState.None;
+	var _teamMember;
+
 	async.series({
 		queryTeamObj: function(callback) {
 			_teamObject = gTeamObjDict[data.teamId];
@@ -119,12 +124,39 @@ handler.applyBetGame = function(data, callfunc) {
 			return callback(null);
 		},
 		checkTeamMember: function(callback) {
+			var _activeUser = 0;
+			_teamMember = _teamObject.getTeamMemberList();
+			if (!_teamMember) return callback('query team member list error');
+
+			for (var i in _teamMember) {
+				if (_teamMember[i].userBasic.state == consts.UserState.Progress) ++_activeUser;
+			}
+
+			if (_activeUser == 1) {
+				_gameState = consts.GameState.Clear;
+			} else if (_activeUser >= 2) {
+				_gameState = consts.GameState.Process;
+			}
 			return callback(null);
 		},
 		updateUserBalance: function(callback) {
+			if (_gameState == consts.GameState.Clear) {
+
+			} else if (_gameState == consts.GameState.Process) {
+
+			} else {
+
+			}
 			return callback(null);
 		},
 		pushMessage: function(callback) {
+			if (_gameState == consts.GameState.Clear) {
+
+			} else if (_gameState == consts.GameState.Process) {
+
+			} else {
+
+			}
 			return callback(null);
 		}
 	}, function(error, doc) {
