@@ -1,5 +1,5 @@
-var utils = require('../../../util/utils');
-var teamManager = require('../../../service/teamManager');
+//var utils = require('../../../util/utils');
+var teamManager = require('../../../services/teamManager');
 
 module.exports = function(){
 	return new TeamRemote();

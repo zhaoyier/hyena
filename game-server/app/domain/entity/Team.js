@@ -61,7 +61,7 @@ Team.prototype.addPlayer = function(data) {
 
 Team.prototype.updateTeamMemberBasic = function(data) {
 	for (var i in this.teamMemberArray) {
-		if (this.teamMemberArray[i].userId == data.userId)
+		//if (this.teamMemberArray[i].userId == data.userId)
 	}
 }
 
@@ -74,9 +74,9 @@ Team.prototype.getTeamBasicInfo = function() {
 }
 
 Team.prototype.updateTeamMemberBet = function() {
-	if (this.teamBasic.teamType == ) {
+	if (this.teamBasic.teamType == consts.TeamType.Gold) {
 
-	} else if (this.teamBasic.teamType == ) {
+	} else if (this.teamBasic.teamType == consts.TeamType.Diamond) {
 
 	} else {
 		
