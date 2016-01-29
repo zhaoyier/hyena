@@ -114,7 +114,7 @@ handler.applyStartGame = function(data, callfunc) {
 
 handler.applyBetGame = function(data, callfunc) {
 	var _teamObject = null, _rtnData = [], _gameState = consts.GameState.None;
-	var _teamMember;
+	var _teamMember, _userId = data.userId;
 
 	async.series({
 		queryTeamObj: function(callback) {
@@ -143,7 +143,16 @@ handler.applyBetGame = function(data, callfunc) {
 			if (_gameState == consts.GameState.Clear) {
 
 			} else if (_gameState == consts.GameState.Process) {
-
+				_teamObject.teamBasic.bet += 10;	//todo
+				for (var i in _teamMember) {
+					if (_teamMember[i].userId == _userId) {
+						if (_teamMember[i].userBasic.bet >= 10) {	//todo
+							_teamMember[i].userBasic.bet -= 10;
+						} else {
+							return callback('lack of balance');
+						}
+					} 
+				}
 			} else {
 
 			}

@@ -12,7 +12,7 @@ var MAX_MEMBER_NUM = 3;
 function Team(teamId, teamType){
 	this.cardService = new Card();
 	this.teamMemberArray = new Array();
-	this.teamBasic = {state: consts.GameState.None, timestamp: 0, teamId: teamId, teamType: teamType};	//记录游戏状态
+	this.teamBasic = {state: consts.GameState.None, timestamp: 0, teamId: teamId, teamType: teamType, bet: 0};	//记录游戏状态
 	this.channel = this.createChannel(teamId);
 	//this.teamBa = {teamId: teamId, teamType: teamType};
 }
