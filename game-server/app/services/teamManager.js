@@ -225,3 +225,17 @@ function getHasPositionTeam(teamType) {
 
 	return null;
 }
+
+function getTeamMembersByType(teamObject, gameType) {
+	if (!teamObject) return null;
+
+	if (!gameType) gameType = consts.UserState.Progress;
+	var _teamMember = _teamObject.getTeamMemberList();
+	if (!_teamMember) return null;
+
+	var _activeUser = 0;
+	for (var i in _teamMember) {
+		if (_teamMember[i].userBasic.state == consts.UserState.Progress) ++_activeUser;
+	}
+	return _activeUser;
+}
