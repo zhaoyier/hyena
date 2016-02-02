@@ -9,8 +9,9 @@ module.exports = {
 		None: 0,
 		Observer: 1,		//旁观者
 		Progress: 2,		//游戏中
-		Offline: 3,			//离线状态
-		Leave: 4			//离开游戏
+		Abandon: 3,			//放弃
+		Offline: 4,			//离线状态
+		Leave: 5			//离开游戏
 	}, CardType: {
 		None: 0,
 		DANPAI: 1, 

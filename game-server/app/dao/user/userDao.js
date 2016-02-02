@@ -16,7 +16,7 @@ var userDao = module.exports;
 *
 * */
 userDao.checkUsernameAndPwd = function(data, callfunc) {
-	pomelo.app.get('dbclient').game_user.findAndModify({username: data.username, password: data.password, server: data.server}, [['_id', -1]], {$set: {s: 1}}, {lastLogin: Date.now()/1000|0}, function(error, doc) {
+	pomelo.app.get('dbclient').game_user.findAndModify({username: data.username, password: data.password, server: data.server}, [['_id', -1]], {$set: {s: 1, lastLogin: Date.now()/1000|0}}, {}, function(error, doc) {
 		if (error || !doc) return callback(null, false);
 
 		return callfunc(null, true);
@@ -29,12 +29,13 @@ userDao.checkUsernameAndPwd = function(data, callfunc) {
 userDao.updateUserBalance = function(data, callfunc) {
 	var game_user_account = pomelo.app.get('dbclient').game_user_account;
 	if (data.currentType == 1) {
-		game_user_account.update({_id: data.userId}, {$set: {gold: data.balance}}, {w:1}, function(error, doc) {
-			return callfunc(null);
+		game_user_account.findAndModify({_id: data.userId}, [['_id', 1]], {$inc: {gold: data.minus}}, {}, function(error, doc) {
+			return callfunc(error, doc);
 		})
+
 	} else {
-		game_user_account.update({_id: data.userId}, {$set: {diamond: data.diamond}}, {w:1}, function(error, doc) {
-			return callfunc(null);
+		game_user_account.findAndModify({_id: data.userId}, [['_id', 1]], {$inc: {diamond: data.minus}}, {}, function(error, doc) {
+			return callfunc(error, doc);
 		})
 	}
 	
@@ -51,7 +52,7 @@ userDao.recordUserRecharge = function(data, callfunc) {
 			})
 		},
 		updateBalance: function(callback) {
-			pomelo.app.get('dbclient').game_user_account.update({_id: data.userId}, {$inc: {diamond: data.diamond}, $set: {vip: 1}}, {w: 1}, function(error, doc) {
+			pomelo.app.get('dbclient').game_user_account.update({_id: data.userId}, {$inc: {diamond: data.diamond}, $set: {vip: 1}}, {}, function(error, doc) {
 				return callback(null);
 			})
 		}

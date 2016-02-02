@@ -39,8 +39,11 @@ Team.prototype.addPlayer = function(data) {
 		userId: data.userId,
 		//userBasic: {name: 'admin', gold: 99, diamond: 99, avatar: '001', state: consts.UserState.None, lastHeart: Date.now(), server: data.serverId, device: data.device},	//todo
 		userBasic: {state: consts.UserState.None, lastHeart: Date.now()/1000|0, gold: 100, diamond: 100, bet: 0},
+		//userBasic: initUserBasic(),
 		userCard: {handCard: new Array(), cardType: 0, cardState: consts.CardState.None/*出牌状态*/},
 	});
+
+	return true;
 
 	//todo: 同步队友
 	// this.pushUserMsg2All(function(error, doc) {
@@ -62,15 +65,24 @@ Team.prototype.getTeamBasicInfo = function() {
 	return this.teamBasic;
 }
 
-Team.prototype.updateTeamMemberBet = function() {
-	if (this.teamBasic.teamType == consts.TeamType.Gold) {
-
-	} else if (this.teamBasic.teamType == consts.TeamType.Diamond) {
-
-	} else {
-
+Team.prototype.getProcessTeammember = function() {
+	var _activeMember = [];
+	for (var i in this.teamMemberArray) {
+		if (this.teamMemberArray[i].userBasic.state == consts.UserState.Progress) _activeMember.push(this.teamMemberArray[i]);
 	}
+
+	return _activeMember;
 }
+
+// Team.prototype.updateTeamMemberBet = function() {
+// 	if (this.teamBasic.teamType == consts.TeamType.Gold) {
+
+// 	} else if (this.teamBasic.teamType == consts.TeamType.Diamond) {
+
+// 	} else {
+
+// 	}
+// }
 
 //通知开始
 Team.prototype.pushStartMsg2All = function(data, callfunc) {
@@ -310,8 +322,8 @@ Team.prototype.pushUserMsg2All = function(callfunc) {
 // }
 
 
-function test() {
-	return "tst";
+function initUserBasic(data) {
+	return {};
 }
 
 function findNext(userList, currentId) {
