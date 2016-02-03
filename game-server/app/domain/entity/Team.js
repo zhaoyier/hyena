@@ -68,7 +68,7 @@ Team.prototype.getTeamBasicInfo = function() {
 	return this.teamBasic;
 }
 
-Team.prototype.getProcessTeammember = function() {
+Team.prototype.getProcessTeamMember = function() {
 	var _activeMember = [];
 	for (var i in this.teamMemberArray) {
 		if (this.teamMemberArray[i].userBasic.state == consts.UserState.Progress) _activeMember.push(this.teamMemberArray[i]);

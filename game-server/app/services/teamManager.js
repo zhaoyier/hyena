@@ -67,10 +67,13 @@ handler.applyPrepareGame = function(data, callfunc) {
 			_teamObject = gTeamObjDict[data.teamId];
 			if (!_teamObject) return callback('error team id');
 
+			var _processTeammember = _teamObject.getProcessTeamMember();
+			if (_processTeammember.length < 2) return callback("less limit member");
+
 			return callback(null);
 		},
 		calculateWeight: function(callback) {
-			//计算该玩家的权重之，分配牌型
+			//todo: 计算该玩家的权重之，分配牌型
 			return callback(null);
 		},
 		updateTeamObj: function(callback) {
@@ -98,6 +101,9 @@ handler.applyPrepareGame = function(data, callfunc) {
 	})
 }
 
+/* *
+* @function: 
+* */
 handler.applyStartGame = function(data, callfunc) {
 	var _teamObject = null, _rtnData = [];
 	async.series({
@@ -109,29 +115,28 @@ handler.applyStartGame = function(data, callfunc) {
 		},
 		initCardBasic: function(callback) {
 			var _nowTimestamp = Date.now()/1000|0;
-			var _teamMemberList = _teamObject.getTeamMemberList();
+			var _teamMemberList = _teamObject.getProcessTeamMember();
 			if (_teamMemberList.length < 2) return callback('team member less limit');
 
 			for (var i in _teamMemberList) {
-				if ((_nowTimestamp - _teamMemberList[i].userBasic.activeTime) >= ACTIVE_USER_TIME) _teamMemberList[i].userBasic.state = consts.UserState.Offline;
+				//if ((_nowTimestamp - _teamMemberList[i].userBasic.activeTime) >= ACTIVE_USER_TIME) _teamMemberList[i].userBasic.state = consts.UserState.Offline;
 
 				if (_teamMemberList[i].userBasic.state == consts.UserState.Ready) {
  					//初始化
  					_teamMemberList[i].userCard = _teamObject.initTeamCard(_teamMemberList[i].userBasic.weight);
-				} else {
-					_teamMemberList.splice(i, 1);
 				}
 			}
 
 			return callback(null);
 		},
 		filterData: function(callback) {
-			//筛选数据, 金额
+			//筛选数据, 金额, 修改状态
 			var _teamMemberList = _teamObject.getTeamMemberList();
 			if (_teamMemberList.length < 2) return callback('team member less limit');
 
 			for (var i in _teamMemberList) {
 				_rtnData.push({userId: _teamMemberList[i].userId});
+				_teamMemberList[i].userBasic.state = consts.UserState.Progress;
 			}
 
 			return callback(null);
@@ -290,15 +295,15 @@ function clearingGameEnd(teamObj, userId, callfunc) {
 			_teamBasic.state = consts.GameState.Clear;
 
 			//todo: 判断游戏人数和游戏状态
-			_processTeamMember = teamObject.getProcessTeammember();
+			_processTeamMember = teamObject.getProcessTeamMember();
 			if (!_processTeamMember || _processTeamMember.length != 1) return callback('error data');
 
 			return callback(null);
 		},
 		updateDB: function(callback) {
 			var _winAmount = 0;
-			var _teamMember = teamObj.getTeamMemberList();
-			async.eachSeries(_teamMember, function(elem, cb) {
+			var _teamMemberList = teamObj.getTeamMemberList();
+			async.eachSeries(_teamMemberList, function(elem, cb) {
 				if (elem.userBasic.state == consts.UserState.Abandon) {
 					_winAmount += elem.userBasic.bet;
 					userDao.updateUserBalance({userId: elem.userId, currentType: 1, minus: elem.userBasic.bet}, cb);
@@ -313,10 +318,12 @@ function clearingGameEnd(teamObj, userId, callfunc) {
 		},
 		resetTeamInfo: function(callback) {
 			//todo: 数据初始化
-			var _teamMember = teamObj.getTeamMemberList();
-			for (var i in _teamMember) {
-				_teamMember[i].userBasic.bet = 0;
-				_teamMember[i].userCard = {handCard: new Array(), cardType: 0, cardState: consts.CardState.None};
+			var _teamMemberList = teamObj.getTeamMemberList();
+			for (var i in _teamMemberList) {
+				_teamMemberList[i].userBasic.bet = 0;
+				//todo: 清除掉线玩家
+
+				_teamMemberList[i].userCard = {handCard: new Array(), cardType: 0, cardState: consts.CardState.None};
 			}
 
 			var _teamBasic = teamObj.getTeamBasicInfo();
@@ -338,7 +345,7 @@ function deductGameBet(teamObject, userId, state, callfunc) {
 
 	async.series({
 		deductBalance: function(callback) {
-			var _processTeamMember = teamObject.getProcessTeammember();
+			var _processTeamMember = teamObject.getProcessTeamMember();
 			if (!_processTeamMember) return callback('error team object');
 
 			for (var i in _processTeamMember) {
