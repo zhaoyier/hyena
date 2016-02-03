@@ -19,12 +19,30 @@ public class Login : MonoBehaviour {
 		JsonObject _object = new JsonObject();
 		_object.Add ("username", "zhaoyier");
 		_object.Add ("rid", 1);
-		Network.post ("connector.entryHandler.enter", _object, (data)=>{
+		Network.post ("connector.entryHandler.login", _object, (data)=>{
+		//Network.post ("game.gameHandler.joinTeam", _object, (data)=>{
 			Debug.Log("==========>>>003:\t"+data);
 		});
 	}
 
-	public void Test() {
-
+	public void OnTrigger(){
+		JsonObject _object = new JsonObject();
+		_object.Add ("username", "zhaoyier");
+		_object.Add ("rid", 1);
+		//Network.post ("game.gameHandler.startTeam", _object, (data)=>{
+		Network.post ("game.gameHandler.joinTeam", _object, (data)=>{
+			Debug.Log("==========>>>004:\t"+data);
+		});
 	}
+
+	public void OnStartTeam(){
+		JsonObject _object = new JsonObject();
+		_object.Add ("username", "zhaoyier");
+		_object.Add ("rid", 1);
+		//Network.post ("game.gameHandler.startTeam", _object, (data)=>{
+		Network.post ("game.gameHandler.startTeam", _object, (data)=>{
+			Debug.Log("==========>>>005:\t"+data);
+		});
+	}
+
 }

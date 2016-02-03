@@ -26,6 +26,7 @@ public class Network {
 
 	public static void getGameServerHandler(Action<PomeloClient> action) {
 		getGameServerList ((list) => {
+			Debug.Log("========>>1002:\t"+list);
 			if (Convert.ToInt32(list["code"]) == 200 ) {
 				_gameClient.disconnect();
 				_gameClient = new PomeloClient((string)list["host"], Convert.ToInt32(list["port"]));
