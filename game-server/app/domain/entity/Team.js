@@ -4,7 +4,9 @@
 var async = require('async');
 var Card = require('./Card');
 var pomelo = require('pomelo');
+
 var consts = require('../../config/consts');
+var channelUtil = require('../../util/channelUtil');
 
 //每个人: 设备类型
 var MAX_MEMBER_NUM = 3;
