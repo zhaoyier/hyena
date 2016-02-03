@@ -11,7 +11,7 @@ var channelUtil = require('../../util/channelUtil');
 //每个人: 设备类型
 var MAX_MEMBER_NUM = 3;
 
-function Team(teamId, teamType){
+function Team(teamId, teamType) {
 	this.cardService = new Card();
 	this.teamMemberArray = new Array();
 	this.teamBasic = {state: consts.GameState.None, timestamp: 0, teamId: teamId, teamType: teamType, bet: 0};	//记录游戏状态
@@ -40,9 +40,10 @@ Team.prototype.addPlayer = function(data) {
 	this.teamMemberArray.push({
 		userId: data.userId,
 		//userBasic: {name: 'admin', gold: 99, diamond: 99, avatar: '001', state: consts.UserState.None, lastHeart: Date.now(), server: data.serverId, device: data.device},	//todo
-		userBasic: {state: consts.UserState.None, lastHeart: Date.now()/1000|0, gold: 100, diamond: 100, bet: 0},
+		//userBasic: {state: consts.UserState.None, activeTime: Date.now()/1000|0, gold: 100, diamond: 100, bet: 0},
+		userBasic: {state: consts.UserState.None, activeTime: Date.now()/1000|0, weight: 0, bet: 0},
 		//userBasic: initUserBasic(),
-		userCard: {handCard: new Array(), cardType: 0, cardState: consts.CardState.None/*出牌状态*/},
+		userCard: {userCard: new Array(), cardType: 0, cardState: consts.CardState.None/*出牌状态*/},
 	});
 
 	return true;
@@ -74,6 +75,12 @@ Team.prototype.getProcessTeammember = function() {
 	}
 
 	return _activeMember;
+}
+
+Team.prototype.initTeamCard = function(userWeight) {
+	var _cardType = 1;//userWeight;	//todo: 转换为卡牌类型
+	var _userCard = this.cardService.initCard(_cardType);
+	return {userCard: _userCard, cardType: _cardType, cardState: consts.CardState.None};
 }
 
 // Team.prototype.updateTeamMemberBet = function() {

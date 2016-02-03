@@ -38,7 +38,6 @@ handler.applyJoinTeam = function(data, callfunc) {
 			if (!_teamObject) return callback('create team error');
 
 			if (!_teamObject.addPlayer(data)) return callback('add player error');
-			console.log('======>>>2002:\t', _teamObject.getTeamMemberList());
 			var _teamBasic = _teamObject.getTeamBasicInfo();
 			_teamId = _teamBasic.teamId;
 
@@ -60,6 +59,45 @@ handler.applyJoinTeam = function(data, callfunc) {
 	})
 }
 
+handler.applyPrepareGame = function(data, callfunc) {
+	var _teamObject = null, _rtnData = [], _userWeight = 0;
+
+	async.series({
+		queryTeamObj: function(callback) {
+			_teamObject = gTeamObjDict[data.teamId];
+			if (!_teamObject) return callback('error team id');
+
+			return callback(null);
+		},
+		calculateWeight: function(callback) {
+			//计算该玩家的权重之，分配牌型
+			return callback(null);
+		},
+		updateTeamObj: function(callback) {
+			var _teamMemberList = _teamObject.getTeamMemberList();
+			for (var i in _teamMemberList) {
+				if (_teamMemberList[i].userId == data.userId) {
+					_rtnData.push(data.userId);
+					_teamMemberList[i].userBasic.weight = _userWeight;
+					_teamMemberList[i].userBasic.state = consts.UserState.Ready;
+					_teamMemberList[i].userBasic.activeTime = Date.now()/1000|0;
+				}
+			}
+
+			return callback(null);
+		},
+		pushMessage: function(callback) {
+			return callback(null);
+		}
+	}, function(error, doc) {
+		if (error) {
+			return callfunc(error);
+		} else {
+			return callfunc(null, _rtnData);
+		}
+	})
+}
+
 handler.applyStartGame = function(data, callfunc) {
 	var _teamObject = null, _rtnData = [];
 	async.series({
@@ -71,20 +109,17 @@ handler.applyStartGame = function(data, callfunc) {
 		},
 		initCardBasic: function(callback) {
 			var _nowTimestamp = Date.now()/1000|0;
-			var _teamMember = _teamObject.getTeamMemberList();
-			if (_teamMember.length < 2) return callback('team member less limit');
+			var _teamMemberList = _teamObject.getTeamMemberList();
+			if (_teamMemberList.length < 2) return callback('team member less limit');
 
-			for (var i in _teamMember) {
-				if ((_nowTimestamp - _teamMember[i].userBasic.lastHeart) >= ACTIVE_USER_TIME) _teamMember[i].userBasic.state = consts.UserState.Offline;
+			for (var i in _teamMemberList) {
+				if ((_nowTimestamp - _teamMemberList[i].userBasic.activeTime) >= ACTIVE_USER_TIME) _teamMemberList[i].userBasic.state = consts.UserState.Offline;
 
-				if (_teamMember[i].userBasic.state == consts.UserState.None 
-					|| _teamMember[i].userBasic.state == consts.UserState.Progress) {
+				if (_teamMemberList[i].userBasic.state == consts.UserState.Ready) {
  					//初始化
- 					_teamMember[i].userCard.handCard = new Array();
- 					_teamMember[i].userCard.cardType = consts.CardType.None;
- 					_teamMember[i].userCard.cardState = consts.CardState.None;
+ 					_teamMemberList[i].userCard = _teamObject.initTeamCard(_teamMemberList[i].userBasic.weight);
 				} else {
-					_teamMember.splice(i, 1);
+					_teamMemberList.splice(i, 1);
 				}
 			}
 
@@ -92,11 +127,11 @@ handler.applyStartGame = function(data, callfunc) {
 		},
 		filterData: function(callback) {
 			//筛选数据, 金额
-			var _teamMember = _teamObject.getTeamMemberList();
-			if (_teamMember.length < 2) return callback('team member less limit');
+			var _teamMemberList = _teamObject.getTeamMemberList();
+			if (_teamMemberList.length < 2) return callback('team member less limit');
 
-			for (var i in _teamMember) {
-				_rtnData.push({userId: _teamMember[i].userId});
+			for (var i in _teamMemberList) {
+				_rtnData.push({userId: _teamMemberList[i].userId});
 			}
 
 			return callback(null);

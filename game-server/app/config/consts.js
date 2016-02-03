@@ -8,10 +8,11 @@ module.exports = {
 	}, UserState: {
 		None: 0,
 		Observer: 1,		//旁观者
-		Progress: 2,		//游戏中
-		Abandon: 3,			//放弃
-		Offline: 4,			//离线状态
-		Leave: 5			//离开游戏
+		Ready: 2,			//准备
+		Progress: 3,		//游戏中
+		Abandon: 4,			//放弃
+		Offline: 5,			//离线状态
+		Leave: 6			//离开游戏
 	}, CardType: {
 		None: 0,
 		DANPAI: 1, 
