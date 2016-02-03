@@ -1,5 +1,5 @@
 var utilFunc = require('../../../util/utilFunc');
-var teamManager = require('../../../service/teamManager');
+//var teamManager = require('../../../service/teamManager');
 
 module.exports = function(app) {
 	return new Handler(app);
@@ -13,7 +13,7 @@ var handler = Handler.prototype;
 
 handler.joinTeam = function(msg, session, next) {
 	var _userBasic = {userId: 1, username: 'admin'};
-	this.app.rpc.manager.teamRemote.applyJoinTeam(session, msg, function(error, doc) {
+	this.app.rpc.manager.teamRemote.applyJoinTeam(session, {teamType: 1}, function(error, doc) {
 		return next(null, {code: 200, msg: 'ok'});
 	})
 }

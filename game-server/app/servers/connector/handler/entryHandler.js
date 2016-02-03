@@ -38,8 +38,8 @@ handler.login = function(msg, session, next) {
 			session.set('serverId', msg.serverId); //todo: client上传或重新计算
             session.set('username', msg.username);
             session.set('userId', 101); //todo: 查询数据库返回
-            session.set('accmount': {gold: 1000, diamond: 1000});
-            session.set('match': {win: 100, lose: 100});
+            session.set('account', {gold: 1000, diamond: 1000});
+            session.set('match', {win: 100, lose: 100});
             session.on('closed', onUserLeave.bind(null, _self.app));
             session.pushAll(callback);
 		},
