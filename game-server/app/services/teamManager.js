@@ -220,7 +220,7 @@ function getTeamObjectById (teamId) {
 
 function getHasPositionTeam(teamType) {
 	for (var i in gTeamObjDict) {
-		if (gTeamObjDict[i].isTeamHasPosition() && gTeamObjDict[i].team.teamType == teamType) return gTeamObjDict[i];
+		if (gTeamObjDict[i].isTeamHasPosition() && gTeamObjDict[i].teamBasic.teamType == teamType) return gTeamObjDict[i];
 	}
 
 	return null;
