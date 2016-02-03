@@ -20,7 +20,7 @@ var handler = Handler.prototype;
  * @return {Void}
  */
 handler.login = function(msg, session, next) {
-	var _self = this;
+	var _self = this, _userId = 0;
 	
 	async.series({
 		checkUserToken: function(callback) {
@@ -30,14 +30,15 @@ handler.login = function(msg, session, next) {
 			userDao.checkUsernameAndPwd(msg, function(error, doc) {
 				if (doc == false) return callback(null);
 
+				_userId = doc._id;
 				return callback(false);
 			})
 		},
 		recordUserBasic: function(callback) {
 			session.set('deviceId', msg.deviceId); //todo: 设备类型
-			session.set('serverId', msg.serverId); //todo: client上传或重新计算
+			session.set('serverId', _self.app.get('serverId')); //todo: client上传或重新计算
             session.set('username', msg.username);
-            session.set('userId', 101); //todo: 查询数据库返回
+            session.set('userId', _userId); //todo: 查询数据库返回
             session.set('account', {gold: 1000, diamond: 1000});
             session.set('match', {win: 100, lose: 100});
             session.on('closed', onUserLeave.bind(null, _self.app));

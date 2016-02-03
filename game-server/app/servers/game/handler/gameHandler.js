@@ -13,7 +13,10 @@ var handler = Handler.prototype;
 
 handler.joinTeam = function(msg, session, next) {
 	var _userBasic = {userId: 1, username: 'admin'};
-	this.app.rpc.manager.teamRemote.applyJoinTeam(session, {teamType: 1}, function(error, doc) {
+	var _userId = session.get('userId');
+	var _serverId = session.get('serverId');
+
+	this.app.rpc.manager.teamRemote.applyJoinTeam(session, {userId: msg.userId, teamType: 1, serverId: _serverId}, function(error, doc) {
 		return next(null, {code: 200, msg: 'ok'});
 	})
 }

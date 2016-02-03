@@ -37,8 +37,8 @@ handler.applyJoinTeam = function(data, callfunc) {
 			_teamObject = getHasPositionTeam(data.teamType) || new Team(++gTeamId, data.teamType);
 			if (!_teamObject) return callback('create team error');
 
-			if (_teamObject.addPlayer(data)) return callback('add player error');
-
+			if (!_teamObject.addPlayer(data)) return callback('add player error');
+			console.log('======>>>2002:\t', _teamObject.getTeamMemberList());
 			var _teamBasic = _teamObject.getTeamBasicInfo();
 			_teamId = _teamBasic.teamId;
 
