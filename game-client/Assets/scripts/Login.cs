@@ -17,7 +17,9 @@ public class Login : MonoBehaviour {
 
 	public void OnClick(){
 		JsonObject _object = new JsonObject();
-		_object.Add ("username", "zhaoyier");
+		_object.Add ("username", "temp");
+		_object.Add ("password", "temp");
+		_object.Add ("server", 1);
 		_object.Add ("rid", 1);
 		Network.post ("connector.entryHandler.login", _object, (data)=>{
 		//Network.post ("game.gameHandler.joinTeam", _object, (data)=>{
@@ -43,6 +45,11 @@ public class Login : MonoBehaviour {
 		Network.post ("game.gameHandler.startTeam", _object, (data)=>{
 			Debug.Log("==========>>>005:\t"+data);
 		});
+	}
+
+	public void OnExitGame() {
+		Network._gameClient.disconnect ();
+		Application.Quit ();
 	}
 
 }
