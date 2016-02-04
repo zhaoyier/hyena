@@ -17,6 +17,7 @@ var handler = Handler.prototype;
 * @argument: msg: {teamType}
 * */
 handler.joinTeam = function(msg, session, next) {
+	var _self = this;
 	var _param = {userId: session.get('userId'), 
 				serverId: session.get('serverId'), 
 				teamType: msg.teamType};
@@ -33,7 +34,7 @@ handler.joinTeam = function(msg, session, next) {
 			})
 		},
 		applyJoinTeam: function(callback) {
-			this.app.rpc.manager.teamRemote.applyJoinTeam(session, _param, function(error, doc) {
+			_self.app.rpc.manager.teamRemote.applyJoinTeam(session, _param, function(error, doc) {
 				if (error) return callback('202');
 
 				_rtnData = doc;

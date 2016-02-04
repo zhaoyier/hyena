@@ -37,11 +37,12 @@ Team.prototype.addPlayer = function(data) {
 	//加入频道
 	if (!this.addPlayer2Channel(data)) return false;
 	//加入队伍
+
 	this.teamMemberArray.push({
 		userId: data.userId,
 		//userBasic: {name: 'admin', gold: 99, diamond: 99, avatar: '001', state: consts.UserState.None, lastHeart: Date.now(), server: data.serverId, device: data.device},	//todo
 		//userBasic: {state: consts.UserState.None, activeTime: Date.now()/1000|0, gold: 100, diamond: 100, bet: 0},
-		userBasic: {username: data.username, state: consts.UserState.None, activeTime: Date.now()/1000|0, weight: 0, bet: 0},
+		userBasic: {username: data.basic.username, state: consts.UserState.None, activeTime: Date.now()/1000|0, weight: 0, bet: 0},
 		//userBasic: initUserBasic(),
 		userCard: {userCard: new Array(), cardType: 0, cardState: consts.CardState.None/*出牌状态*/},
 	});
