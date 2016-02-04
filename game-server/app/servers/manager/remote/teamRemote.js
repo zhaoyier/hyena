@@ -11,7 +11,7 @@ var TeamRemote = function(){
 
 TeamRemote.prototype.applyJoinTeam = function(args, callfunc) {
 	teamManager.applyJoinTeam(args, function(error, doc) {
-		return callfunc(null);
+		return callfunc(error, doc);
 	})
 }
 

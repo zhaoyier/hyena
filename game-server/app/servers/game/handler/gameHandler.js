@@ -18,9 +18,9 @@ handler.joinTeam = function(msg, session, next) {
 	var _param = {userId: session.get('userId'), 
 				serverId: session.get('serverId'), 
 				teamType: msg.teamType};
-	
+
 	this.app.rpc.manager.teamRemote.applyJoinTeam(session, _param, function(error, doc) {
-		return next(null, {code: 200, msg: 'ok'});
+		return next(null, {code: 200, msg: doc});
 	})
 }
 
