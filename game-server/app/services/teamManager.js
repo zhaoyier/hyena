@@ -3,7 +3,7 @@ var pomelo = require('pomelo');
 
 
 var Team = require('../domain/entity/Team');
-var UtilFunc = require('../util/utilFunc');
+var utilFunc = require('../util/utilFunc');
 var consts = require('../config/consts');
 var ServerStatus = require('../config/consts').ServerStatus;
 var GameDao = require('../dao/game/gameDao');
@@ -25,7 +25,8 @@ var ACTIVE_USER_TIME = 100;
 * @api public
 * */
 handler.applyJoinTeam = function(data, callfunc) {
-	var _teamObject = null, _teamId = 0;
+	var _teamObject = null;
+	var _rtnData = {teamId: 0, member: []};
 
 	async.series({
 		checkArgs: function(callback) {
@@ -38,14 +39,35 @@ handler.applyJoinTeam = function(data, callfunc) {
 			if (!_teamObject) return callback('create team error');
 
 			if (!_teamObject.addPlayer(data)) return callback('add player error');
-			var _teamBasic = _teamObject.getTeamBasicInfo();
-			_teamId = _teamBasic.teamId;
+			//var _teamBasic = _teamObject.getTeamBasicInfo();
+			//_rtnData['teamId'] = _teamBasic.teamId;
+			//_teamId = _teamBasic.teamId;
 
 			if (!gTeamObjDict[_teamObject.teamId]) {
 				gTeamObjDict[_teamObject.teamId] = _teamObject;
 			}
 
 			return callback(null);
+		},
+		queryTeamBasic: function(callback) {
+			var _teamId = _teamObject.getTeamBasicInfo().teamId;
+			var _teamMemberList = _teamObject.getTeamMemberList();
+
+			_rtnData['teamId'] = _teamId;
+
+			//todo: 查数据库OR直接查询缓存
+			async.eachSeries(_teamMemberList, function(elem, cb) {
+				userDao.queryUserBasic({userId: elem.userId}, function(error, doc) {
+					if (error) {
+						console.log('applyJoinTeam Error:\t', error);
+						return cb(null);
+					} else {
+						_rtnData['member'].push(doc);
+					}
+				})
+			}, function(error) {
+				return callback(error);
+			})
 		},
 		pushMessage: function(callback) {
 			return callback(null);
@@ -54,11 +76,12 @@ handler.applyJoinTeam = function(data, callfunc) {
 		if (error) {
 			return callfunc(error, doc);
 		} else {
-			return callfunc(error, doc);
+			return callfunc(error, _rtnData);
 		}
 	})
 }
 
+//准备开始
 handler.applyPrepareGame = function(data, callfunc) {
 	var _teamObject = null, _rtnData = [], _userWeight = 0;
 
@@ -74,6 +97,8 @@ handler.applyPrepareGame = function(data, callfunc) {
 		},
 		calculateWeight: function(callback) {
 			//todo: 计算该玩家的权重之，分配牌型
+			var _weightScore = utilFunc.getUserWeightScore();
+			_userWeight = utilFunc.getUserCardType(_weightScore);
 			return callback(null);
 		},
 		updateTeamObj: function(callback) {
@@ -114,7 +139,6 @@ handler.applyStartGame = function(data, callfunc) {
 			return callback(null);
 		},
 		initCardBasic: function(callback) {
-			var _nowTimestamp = Date.now()/1000|0;
 			var _teamMemberList = _teamObject.getProcessTeamMember();
 			if (_teamMemberList.length < 2) return callback('team member less limit');
 

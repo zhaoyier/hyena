@@ -26,6 +26,44 @@ userDao.checkUsernameAndPwd = function(data, callfunc) {
 /* *
 *
 * */
+userDao.queryUserBasic = function(data, callfunc) {
+	var _rtnData = {userId: data.userId};
+
+	async.series({
+		queryUserBasic: function(callback) {
+			pomelo.app.get('dbclient').game_user.findOne({_id: data.userId}, {username: 1, avatar: 1}, function(error, doc) {
+				if (error || !doc) return callback('error db or userId');
+
+				if (!doc.username) return callback('error username');
+				if (!doc.avatar) doc.avatar = "temp";
+
+				_rtnData['username'] = doc.username;
+				_rtnData['avatar'] = doc.avatar;
+
+				return callback(null);
+			})
+		},
+		queryUserAccount: function(callback) {
+			pomelo.app.get('dbclient').game_user.findOne({_id: data.userId}, {gold: 1, diamond: 1}, function(error, doc) {
+				if (error) return callback(error);
+
+				if (!doc) doc = {gold: 0, diamond: 0};
+				if (!doc.gold) doc.gold = 0;
+				if (!doc.diamond) doc.diamond = 0;
+
+				_rtnData['gold'] = 0;
+				_rtnData['diamond'] = 0;
+				return callback(null);
+			})
+		}
+	}, function(error, doc) {
+		return callfunc(error, _rtnData);
+	})
+}
+
+/* *
+*
+* */
 userDao.updateUserBalance = function(data, callfunc) {
 	var game_user_account = pomelo.app.get('dbclient').game_user_account;
 	if (data.currentType == 1) {
@@ -38,7 +76,6 @@ userDao.updateUserBalance = function(data, callfunc) {
 			return callfunc(error, doc);
 		})
 	}
-	
 }
 
 /* *

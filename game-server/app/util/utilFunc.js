@@ -11,13 +11,13 @@ handle.concatJson = function(json, obj) {
 	}
 }
 
-handle.getUserCardWeight = function(fightTime, userVip) {
+handle.getUserWeightScore = function(fight, userVip){
 	//var _config = [{}]
 	return 300;
 }
 
 handle.getUserCardType = function(userScore) {
-	var _config = [{score: 100, type: [{i: 1, r: 100}]}, {score: 2000, type: [{i:1, r: 40}, {i: 2, r: 60}]}, {score: 200000, type: [{i: 1, r: 20}, {i: 2, r: 40}, {i: 3, r: 40}]}];
+	var _config = [{score: 100, type: [{i: 3, r: 100}]}, {score: 2000, type: [{i:1, r: 40}, {i: 2, r: 60}]}, {score: 200000, type: [{i: 1, r: 20}, {i: 2, r: 40}, {i: 3, r: 40}]}];
 
 	for (var i in _config) {
 		if (userScore <= _config[i].score) return randomizeRateWeight(_config[i].type);
