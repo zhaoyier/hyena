@@ -41,7 +41,7 @@ Team.prototype.addPlayer = function(data) {
 		userId: data.userId,
 		//userBasic: {name: 'admin', gold: 99, diamond: 99, avatar: '001', state: consts.UserState.None, lastHeart: Date.now(), server: data.serverId, device: data.device},	//todo
 		//userBasic: {state: consts.UserState.None, activeTime: Date.now()/1000|0, gold: 100, diamond: 100, bet: 0},
-		userBasic: {state: consts.UserState.None, activeTime: Date.now()/1000|0, weight: 0, bet: 0},
+		userBasic: {username: data.username, state: consts.UserState.None, activeTime: Date.now()/1000|0, weight: 0, bet: 0},
 		//userBasic: initUserBasic(),
 		userCard: {userCard: new Array(), cardType: 0, cardState: consts.CardState.None/*出牌状态*/},
 	});
@@ -54,18 +54,22 @@ Team.prototype.addPlayer = function(data) {
 	// });
 }
 
-Team.prototype.updateTeamMemberBasic = function(data) {
-	for (var i in this.teamMemberArray) {
-		//if (this.teamMemberArray[i].userId == data.userId)
-	}
-}
-
 Team.prototype.getTeamMemberList = function() {
 	return this.teamMemberArray;
 }
 
 Team.prototype.getTeamBasicInfo = function() {
 	return this.teamBasic;
+}
+
+Team.prototype.getTeamMemberBasic = function() {
+	var _temp = [];
+	for (var i in this.teamMemberArray) {
+		var _elem = this.teamMemberArray[i];
+		_temp.push({username: _elem.userBasic.username, state: _elem.state, bet: _elem.bet});
+	}
+
+	return _temp;
 }
 
 Team.prototype.getProcessTeamMember = function() {
@@ -81,6 +85,12 @@ Team.prototype.initTeamCard = function(userWeight) {
 	var _cardType = 1;//userWeight;	//todo: 转换为卡牌类型
 	var _userCard = this.cardService.initCard(_cardType);
 	return {userCard: _userCard, cardType: _cardType, cardState: consts.CardState.None};
+}
+
+Team.prototype.updateTeamMemberBasic = function(data) {
+	for (var i in this.teamMemberArray) {
+		//if (this.teamMemberArray[i].userId == data.userId)
+	}
 }
 
 // Team.prototype.updateTeamMemberBet = function() {

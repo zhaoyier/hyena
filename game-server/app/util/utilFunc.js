@@ -26,7 +26,7 @@ handle.getUserCardType = function(userScore) {
 	return 1;
 }
 
-handler.randomizeRateWeight = function (config) {
+handle.randomizeRateWeight = function (config) {
 	var _totalRate = 0, _addRate = 0;
 	for (var i in config) { _totalRate += config[i].r; }
 

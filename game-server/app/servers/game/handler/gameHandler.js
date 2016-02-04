@@ -1,4 +1,6 @@
+var async = require('async');
 var utilFunc = require('../../../util/utilFunc');
+var userDao = require('../../../dao/user/userDao');
 //var teamManager = require('../../../service/teamManager');
 
 module.exports = function(app) {
@@ -19,8 +21,27 @@ handler.joinTeam = function(msg, session, next) {
 				serverId: session.get('serverId'), 
 				teamType: msg.teamType};
 
-	this.app.rpc.manager.teamRemote.applyJoinTeam(session, _param, function(error, doc) {
-		return next(null, {code: 200, msg: doc});
+	var _rtnData = {};
+
+	async.series({
+		queryUserBasic: function(callback) {
+			userDao.queryUserBasic({userId: session.get('userId')}, function(error, doc) {
+				if (error) return callback('201');
+
+				_param['basic'] = doc;
+				return callback(null);
+			})
+		},
+		applyJoinTeam: function(callback) {
+			this.app.rpc.manager.teamRemote.applyJoinTeam(session, _param, function(error, doc) {
+				if (error) return callback('202');
+
+				_rtnData = doc;
+				return callback(null);
+			})
+		}
+	}, function(error, doc) {
+		return next(null, {code: 200, msg: _rtnData});
 	})
 }
 

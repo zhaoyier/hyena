@@ -7,7 +7,7 @@ var utilFunc = require('../util/utilFunc');
 var consts = require('../config/consts');
 var ServerStatus = require('../config/consts').ServerStatus;
 var GameDao = require('../dao/game/gameDao');
-var UserDao = require('../dao/user/userDao');
+var userDao = require('../dao/user/userDao');
 
 var server_resp_hash = require('../config/server_resp_hash').data;
 
@@ -36,39 +36,40 @@ handler.applyJoinTeam = function(data, callfunc) {
 		},
 		addToTeam: function(callback) {
 			_teamObject = getHasPositionTeam(data.teamType) || new Team(++gTeamId, data.teamType);
+
 			if (!_teamObject) return callback('create team error');
 
 			if (!_teamObject.addPlayer(data)) return callback('add player error');
-			//var _teamBasic = _teamObject.getTeamBasicInfo();
-			//_rtnData['teamId'] = _teamBasic.teamId;
-			//_teamId = _teamBasic.teamId;
 
-			if (!gTeamObjDict[_teamObject.teamId]) {
-				gTeamObjDict[_teamObject.teamId] = _teamObject;
-			}
+			var _teamId = _teamObject.getTeamBasicInfo().teamId;
+
+			if (!gTeamObjDict[_teamId]) gTeamObjDict[_teamId] = _teamObject;
+
+			_rtnData.teamId = _teamId;
+			_rtnData.member = _teamObject.getTeamMemberBasic();
 
 			return callback(null);
 		},
-		queryTeamBasic: function(callback) {
-			var _teamId = _teamObject.getTeamBasicInfo().teamId;
-			var _teamMemberList = _teamObject.getTeamMemberList();
+		// queryTeamBasic: function(callback) {
+		// 	var _teamId = _teamObject.getTeamBasicInfo().teamId;
+		// 	var _teamMemberList = _teamObject.getTeamMemberList();
 
-			_rtnData['teamId'] = _teamId;
+		// 	_rtnData['teamId'] = _teamId;
 
-			//todo: 查数据库OR直接查询缓存
-			async.eachSeries(_teamMemberList, function(elem, cb) {
-				userDao.queryUserBasic({userId: elem.userId}, function(error, doc) {
-					if (error) {
-						console.log('applyJoinTeam Error:\t', error);
-						return cb(null);
-					} else {
-						_rtnData['member'].push(doc);
-					}
-				})
-			}, function(error) {
-				return callback(error);
-			})
-		},
+		// 	//todo: 查数据库OR直接查询缓存
+		// 	async.eachSeries(_teamMemberList, function(elem, cb) {
+		// 		userDao.queryUserBasic({userId: elem.userId}, function(error, doc) {
+		// 			if (error) {
+		// 				console.log('applyJoinTeam Error:\t', error);
+		// 				return cb(null);
+		// 			} else {
+		// 				_rtnData['member'].push(doc);
+		// 			}
+		// 		})
+		// 	}, function(error) {
+		// 		return callback(error);
+		// 	})
+		// },
 		pushMessage: function(callback) {
 			return callback(null);
 		}
@@ -382,7 +383,7 @@ function deductGameBet(teamObject, userId, state, callfunc) {
 		},
 		updateDB: function(callback) {
 			//todo: 
-			UserDao.updateUserBalance({userId: userId, currentType: 1, minus: 1}, function(error, doc) {
+			userDao.updateUserBalance({userId: userId, currentType: 1, minus: 1}, function(error, doc) {
 				return callback(error);
 			})
 		},
