@@ -50,26 +50,6 @@ handler.applyJoinTeam = function(data, callfunc) {
 
 			return callback(null);
 		},
-		// queryTeamBasic: function(callback) {
-		// 	var _teamId = _teamObject.getTeamBasicInfo().teamId;
-		// 	var _teamMemberList = _teamObject.getTeamMemberList();
-
-		// 	_rtnData['teamId'] = _teamId;
-
-		// 	//todo: 查数据库OR直接查询缓存
-		// 	async.eachSeries(_teamMemberList, function(elem, cb) {
-		// 		userDao.queryUserBasic({userId: elem.userId}, function(error, doc) {
-		// 			if (error) {
-		// 				console.log('applyJoinTeam Error:\t', error);
-		// 				return cb(null);
-		// 			} else {
-		// 				_rtnData['member'].push(doc);
-		// 			}
-		// 		})
-		// 	}, function(error) {
-		// 		return callback(error);
-		// 	})
-		// },
 		pushMessage: function(callback) {
 			return callback(null);
 		}

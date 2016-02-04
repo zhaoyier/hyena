@@ -36,7 +36,7 @@ app.configure('production|development', 'gate', function(){
 		});
 });
 
-app.configure('production|development', 'connector|game', function() {
+app.configure('production|development', 'connector|game|manager', function() {
 	require('./app/dao/mongodb/mongodb').init(app, function(error, doc) {
 		app.set('dbclient', doc);
 	})
