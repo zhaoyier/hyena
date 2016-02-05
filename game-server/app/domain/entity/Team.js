@@ -41,16 +41,21 @@ Team.prototype.addPlayer = function(data) {
 	if (this.isPlayerInTeam(data.userId)) return false;
 	//加入频道
 	if (!this.addPlayer2Channel(data)) return false;
+	//计算位置
+	var _placeId = this.getNewPlace();
 	//加入队伍
-
 	this.teamMemberArray.push({
 		userId: data.userId,
 		//userBasic: {name: 'admin', gold: 99, diamond: 99, avatar: '001', state: consts.UserState.None, lastHeart: Date.now(), server: data.serverId, device: data.device},	//todo
 		//userBasic: {state: consts.UserState.None, activeTime: Date.now()/1000|0, gold: 100, diamond: 100, bet: 0},
-		userBasic: {username: data.basic.username, 
+		userBasic: {
+			placeId: _placeId,
+			username: data.basic.username, 
 			avatar: data.basic.avatar, //头像
 			state: consts.UserState.None, //游戏状态
 			activeTime: Date.now()/1000|0, //状态更新时间
+			gold: data.basic.gold,
+			diamond: data.basic.diamond,
 			weight: 0, //权重
 			bet: 0 		//
 		},
@@ -93,7 +98,7 @@ Team.prototype.getProcessTeamMember = function() {
 	return _activeMember;
 }
 
-Team.prototype.initTeamCard = function(userWeight) {
+Team.prototype.initUserCard = function(userWeight) {
 	var _cardType = 1;//userWeight;	//todo: 转换为卡牌类型
 	var _userCard = this.cardService.initCard(_cardType);
 	return {userCard: _userCard, cardType: _cardType, cardState: consts.CardState.None};
@@ -103,6 +108,31 @@ Team.prototype.updateTeamMemberBasic = function(data) {
 	for (var i in this.teamMemberArray) {
 		//if (this.teamMemberArray[i].userId == data.userId)
 	}
+}
+
+Team.prototype.getUserBasic = function() {
+	for (var i in this.teamMemberArray) {
+		if (this.teamMemberArray[i].userId == data.userId) return this.teamMemberArray[i];
+	}
+
+	return null;
+}
+
+Team.prototype.getNewPlace = function() {
+	var _placeNumber = 0;
+
+	while (_placeNumber <= MAX_MEMBER_NUM) {
+		var _hasFind = false, ++_placeNumber;
+		for (var i in this.teamMemberArray) {
+			if (this.teamMemberArray[i].userBasic.placeId == _placeNumber) _hasFind = true;
+		}
+
+		if (_hasFind == false) return _placeNumber;
+	}
+}
+
+Team.prototype.getNextPlayer = function() {
+
 }
 
 // Team.prototype.updateTeamMemberBet = function() {
@@ -357,7 +387,7 @@ function initUserBasic(data) {
 	return {};
 }
 
-function findNext(userList, currentId) {
+function findNextPlayer(userList, currentId) {
 	var _tail = userList.slice(-1);
 	if (_tail.userId = currentId) {
 		return userList[0];

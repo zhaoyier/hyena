@@ -122,12 +122,8 @@ handler.applyStartGame = function(data, callfunc) {
 			if (_teamMemberList.length < 2) return callback('team member less limit');
 
 			for (var i in _teamMemberList) {
-				//if ((_nowTimestamp - _teamMemberList[i].userBasic.activeTime) >= ACTIVE_USER_TIME) _teamMemberList[i].userBasic.state = consts.UserState.Offline;
-
-				if (_teamMemberList[i].userBasic.state == consts.UserState.Ready) {
- 					//初始化
- 					_teamMemberList[i].userCard = _teamObject.initTeamCard(_teamMemberList[i].userBasic.weight);
-				}
+				if (_teamMemberList[i].userBasic.state != consts.UserState.Ready) continue;
+				_teamMemberList[i].userCard = _teamObject.initUserCard(_teamMemberList[i].userBasic.weight);
 			}
 
 			return callback(null);
@@ -138,7 +134,7 @@ handler.applyStartGame = function(data, callfunc) {
 			if (_teamMemberList.length < 2) return callback('team member less limit');
 
 			for (var i in _teamMemberList) {
-				_rtnData.push({userId: _teamMemberList[i].userId});
+				_rtnData.push({userId: _teamMemberList[i].userId, gold: _teamMemberList[i].userBasic.gold, diamond: _teamMemberList[i].userBasic.diamond});
 				_teamMemberList[i].userBasic.state = consts.UserState.Progress;
 			}
 
@@ -151,14 +147,13 @@ handler.applyStartGame = function(data, callfunc) {
 		if (error) {
 			return callfunc(error, doc);
 		} else {
-			return callfunc(error, doc);
+			return callfunc(error, _rtnData);
 		}
 	})
 }
 
 handler.applyBetGame = function(data, callfunc) {
 	var _teamObject = null, _rtnData = [], _gameState = consts.GameState.None;
-	var _teamMembers, _userId = data.userId;
 
 	async.series({
 		queryTeamObj: function(callback) {
@@ -168,51 +163,29 @@ handler.applyBetGame = function(data, callfunc) {
 			return callback(null);
 		},
 		checkTeamMember: function(callback) {
-			var _activeUser = 0;
-			_teamMembers = getTeamMembersAsType(_teamObject);
-			if (_teamMembers == null) return callback('query team member list error');
-
-			if (_teamMembers.length == 1) {
-				_gameState = consts.GameState.Clear;
-			} 
-
-			if (_teamMembers.length >= 2) {
-				_gameState = consts.GameState.Process;
-			}
-
-			return callback(null);
-		},
-		updateUserBalance: function(callback) {
-			if (_gameState == consts.GameState.Clear) {
-
-			} else if (_gameState == consts.GameState.Process) {
-				_teamObject.teamBasic.bet += 10;	//todo
-				for (var i in _teamMembers) {
-					if (_teamMembers[i].userId == _userId) {
-						if (_teamMembers[i].userBasic.bet >= 10) {	//todo
-							_teamMembers[i].userBasic.bet -= 10;
-						} else {
-							return callback('lack of balance');
-						}
-					} 
-				}
+			var _teamMemberList = _teamObject.getProcessTeamMember();
+			if (_teamMemberList.length == 1) {
+				doClearingGameEnd(_teamObject, data.userId, function(error, doc) {
+					if (error) return callback(error);
+					_rtnData = doc; _rtnData['gameState'] = consts.GameState.Clear;
+					return callback(null);
+				});
+			} else if (_teamMemberList.length == 2) {
+				var _selfBasic = _teamObject.getUserBasic(data.userId);
+				if (!_selfBasic) return callback('can not find user information');
+				var _userBetType = utilFunc.getUserBetType(_selfBasic.userCard.cardState, data.bet);
+				if (_userBetType == -1) return callback('error card state or bet');
+				doDeductGameBet(_teamObject, data.userId, 1, function(error, doc) {
+					if (error) return callback(error);
+					_rtnData = doc; _rtnData['gameState'] = consts.GameState.Process;
+					return callback(null);
+				});
 			} else {
-
+				return callback('online player less limit');
 			}
-			return callback(null);
-		},
-		pushMessage: function(callback) {
-			if (_gameState == consts.GameState.Clear) {
-
-			} else if (_gameState == consts.GameState.Process) {
-
-			} else {
-
-			}
-			return callback(null);
 		}
 	}, function(error, doc) {
-		return callfunc(error, doc);
+		return callfunc(error, _rtnData);
 	})
 }
 
@@ -286,8 +259,8 @@ function getTeamMembersAsType(teamObject, gameType) {
 /* *
 * todo: 该返回什么数据
 * */
-function clearingGameEnd(teamObj, userId, callfunc) {
-	var _processTeamMember;
+function doClearingGameEnd(teamObj, userId, callfunc) {
+	var _processTeamMember, _rtnData = {winner: 0, amount: 0, member: []};
 
 	async.series({
 		checkState: function(callback) {
@@ -303,20 +276,25 @@ function clearingGameEnd(teamObj, userId, callfunc) {
 
 			return callback(null);
 		},
-		updateDB: function(callback) {
-			var _winAmount = 0;
+		calculateAndUpdate: function(callback) {
 			var _teamMemberList = teamObj.getTeamMemberList();
 			async.eachSeries(_teamMemberList, function(elem, cb) {
-				if (elem.userBasic.state == consts.UserState.Abandon) {
-					_winAmount += elem.userBasic.bet;
+				if (elem.userBasic.state != consts.UserState.Progress) {
+					_rtnData.amount += elem.userBasic.bet;
+					_rtnData.member.push({userId: elem.userId, minus: elem.userBasic.bet});
 					userDao.updateUserBalance({userId: elem.userId, currentType: 1, minus: elem.userBasic.bet}, cb);
+				} else if (elem.userBasic.state == consts.UserState.Progress) {
+					_rtnData.winner = elem.userId;
+					_rtnData.amount += elem.userBasic.bet;
+					_rtnData.member.push({userId: elem.userId, minus: 0});
+					return cb(null);
 				} else {
 					return cb(null);
 				}
 			}, function(error, doc) {
 				if (error) return callfunc('error');
-
-				userDao.updateUserBalance({userId: _processTeamMember.userId, currentType: 1, minue: _winAmount}, callback);
+				
+				userDao.updateUserBalance({userId: _rtnData.winner, currentType: 1, minue: _rtnData.amount}, callback);
 			})
 		},
 		resetTeamInfo: function(callback) {
@@ -325,23 +303,25 @@ function clearingGameEnd(teamObj, userId, callfunc) {
 			for (var i in _teamMemberList) {
 				_teamMemberList[i].userBasic.bet = 0;
 				//todo: 清除掉线玩家
-
 				_teamMemberList[i].userCard = {handCard: new Array(), cardType: 0, cardState: consts.CardState.None};
 			}
 
 			var _teamBasic = teamObj.getTeamBasicInfo();
-			_teamBasic.teamBasic.state = consts.GameState.None;
-			_teamBasic.teamBasic.timestamp = 0;
 			_teamBasic.teamBasic.bet = 0;
+			_teamBasic.teamBasic.timestamp = 0;
+			_teamBasic.teamBasic.state = consts.GameState.None;
 
+			return callback(null);
+		},
+		pushMessage2All: function(callback) {
 			return callback(null);
 		}
 	}, function(error, doc) {
-		return callfunc(null);
+		return callfunc(error, _rtnData);
 	})
 }
 
-function deductGameBet(teamObject, userId, state, callfunc) {
+function doDeductGameBet(teamObject, userId, state, callfunc) {
 	if (!teamObject || !userId) return callfunc('error argument');
 
 	var _deductTeamMember = null;
@@ -365,7 +345,7 @@ function deductGameBet(teamObject, userId, state, callfunc) {
 				return callback(error);
 			})
 		},
-		modifyState: function(callback) {
+		pushMessage2All: function(callback) {
 			return callback(null);
 		}
 	}, function(error, doc) {

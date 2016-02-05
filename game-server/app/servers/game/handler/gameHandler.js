@@ -38,7 +38,8 @@ handler.joinTeam = function(msg, session, next) {
 				if (error) return callback('202');
 
 				_rtnData = doc;
-				return callback(null);
+				session.set('teamId', doc.teamId);
+				session.pushAll(callback);
 			})
 		}
 	}, function(error, doc) {
@@ -50,7 +51,11 @@ handler.joinTeam = function(msg, session, next) {
 * @param: 
 * */
 handler.prepareTeam = function(msg, session, next) {
-	this.app.rpc.manager.teamRemote.applyPrepareGame(session, msg, function(error, doc) {
+	var _param = {userId: session.get('userId'),
+			teamId: session.get('teamId')
+		};
+
+	this.app.rpc.manager.teamRemote.applyPrepareGame(session, _param, function(error, doc) {
 		console.log('======>>>1001:\t', error, doc);
 		return next(null, {code: 200, msg: 'ok'});
 	})
@@ -58,12 +63,14 @@ handler.prepareTeam = function(msg, session, next) {
 
 handler.startTeam = function(msg, session, next) {
 	this.app.rpc.manager.teamRemote.applyStartGame(session, msg, function(error, doc) {
+		console.log('======>>>1002:\t', error, doc);
 		return next(null, {code: 200, msg: 'ok'});
 	})
 }
 
 handler.betTeam = function (msg, session, next) {
 	this.app.rpc.manager.teamRemote.applyBetGame(session, msg, function(error, doc) {
+		console.log('======>>>1003:\t', error, doc);
 		return next(null, {code: 200, msg: 'ok'});
 	})
 }

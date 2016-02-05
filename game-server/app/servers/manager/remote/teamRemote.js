@@ -39,17 +39,10 @@ TeamRemote.prototype.applyStartGame = function(data, callfunc) {
 /* *
 * @param: 
 * */
-TeamRemote.prototype.applyStartGame = function(data, callfunc) {
-	teamManager.applyStartGame(data, function(error, doc) {
+TeamRemote.prototype.applyBetGame = function(data, callfunc) {
+	teamManager.applyBetGame(data, function(error, doc) {
 		return callfunc(error, doc);
 	})
-}
-
-/* *
-* @param: 
-* */
-TeamRemote.prototype.applyBetGame = function(data, callfunc) {
-	return callfunc(error, doc);
 }
 
 /* *
