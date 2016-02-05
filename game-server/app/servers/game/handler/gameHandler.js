@@ -51,6 +51,7 @@ handler.joinTeam = function(msg, session, next) {
 * */
 handler.prepareTeam = function(msg, session, next) {
 	this.app.rpc.manager.teamRemote.applyPrepareGame(session, msg, function(error, doc) {
+		console.log('======>>>1001:\t', error, doc);
 		return next(null, {code: 200, msg: 'ok'});
 	})
 }
