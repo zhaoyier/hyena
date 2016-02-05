@@ -14,7 +14,12 @@ var MAX_MEMBER_NUM = 3;
 function Team(teamId, teamType) {
 	this.cardService = new Card();
 	this.teamMemberArray = new Array();
-	this.teamBasic = {state: consts.GameState.None, timestamp: 0, teamId: teamId, teamType: teamType, bet: 0};	//记录游戏状态
+	this.teamBasic = {state: consts.GameState.None, //状态
+		timestamp: 0, 	//todo: 
+		teamId: teamId, 
+		teamType: teamType, 
+		bet: 0
+	};	//记录游戏状态
 	this.channel = this.createChannel(teamId);
 	//this.teamBa = {teamId: teamId, teamType: teamType};
 }
@@ -42,7 +47,13 @@ Team.prototype.addPlayer = function(data) {
 		userId: data.userId,
 		//userBasic: {name: 'admin', gold: 99, diamond: 99, avatar: '001', state: consts.UserState.None, lastHeart: Date.now(), server: data.serverId, device: data.device},	//todo
 		//userBasic: {state: consts.UserState.None, activeTime: Date.now()/1000|0, gold: 100, diamond: 100, bet: 0},
-		userBasic: {username: data.basic.username, state: consts.UserState.None, activeTime: Date.now()/1000|0, weight: 0, bet: 0},
+		userBasic: {username: data.basic.username, 
+			avatar: data.basic.avatar, //头像
+			state: consts.UserState.None, //游戏状态
+			activeTime: Date.now()/1000|0, //状态更新时间
+			weight: 0, //权重
+			bet: 0 		//
+		},
 		//userBasic: initUserBasic(),
 		userCard: {userCard: new Array(), cardType: 0, cardState: consts.CardState.None/*出牌状态*/},
 	});

@@ -1,3 +1,5 @@
+var async = require('async');
+
 var handle = module.exports;
 
 handle.concatJson = function(json, obj) {

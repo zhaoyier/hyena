@@ -29,7 +29,7 @@ handler.applyJoinTeam = function(data, callfunc) {
 	var _rtnData = {teamId: 0, member: []};
 
 	async.series({
-		checkArgs: function(callback) {
+		checkParam: function(callback) {
 			if (data.teamType !=  consts.TeamType.Gold && data.teamType != consts.TeamType.Diamond) return callback('error team type');
 
 			return callback(null);
@@ -71,18 +71,15 @@ handler.applyPrepareGame = function(data, callfunc) {
 			_teamObject = gTeamObjDict[data.teamId];
 			if (!_teamObject) return callback('error team id');
 
-			var _processTeammember = _teamObject.getProcessTeamMember();
-			if (_processTeammember.length < 2) return callback("less limit member");
+			var _processTeamMember = _teamObject.getProcessTeamMember();
+			if (_processTeamMember.length < 2) return callback("less limit member");
 
 			return callback(null);
 		},
-		calculateWeight: function(callback) {
+		initUserCard: function(callback) {
 			//todo: 计算该玩家的权重之，分配牌型
 			var _weightScore = utilFunc.getUserWeightScore();
 			_userWeight = utilFunc.getUserCardType(_weightScore);
-			return callback(null);
-		},
-		updateTeamObj: function(callback) {
 			var _teamMemberList = _teamObject.getTeamMemberList();
 			for (var i in _teamMemberList) {
 				if (_teamMemberList[i].userId == data.userId) {
@@ -91,8 +88,9 @@ handler.applyPrepareGame = function(data, callfunc) {
 					_teamMemberList[i].userBasic.state = consts.UserState.Ready;
 					_teamMemberList[i].userBasic.activeTime = Date.now()/1000|0;
 				}
+				//todo: 是否需要加入其他返回数据
+				_rtnData.push({userId: _teamMemberList[i].userId, state: _teamMemberList[i].userBasic.state}); 
 			}
-
 			return callback(null);
 		},
 		pushMessage: function(callback) {

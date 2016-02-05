@@ -24,7 +24,9 @@ userDao.checkUsernameAndPwd = function(data, callfunc) {
 }
 
 /* *
-*
+* Get user basic info
+* @param: {Number} userId
+* @return: {username, avata, account(gold, diamond)}
 * */
 userDao.queryUserBasic = function(data, callfunc) {
 	var _rtnData = {userId: data.userId};
@@ -59,6 +61,15 @@ userDao.queryUserBasic = function(data, callfunc) {
 	}, function(error, doc) {
 		return callfunc(error, _rtnData);
 	})
+}
+
+/* *
+* Get user information
+* @param: {Number} userId
+* @return: {username, avata, account(gold, diamond)...}
+* */
+userDao.queryUserInformation = function(data, callfunc) {
+	return callfunc(null);
 }
 
 /* *
