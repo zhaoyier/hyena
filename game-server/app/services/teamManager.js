@@ -259,7 +259,7 @@ function getTeamMembersAsType(teamObject, gameType) {
 /* *
 * todo: 该返回什么数据
 * */
-function doClearingGameEnd(teamObj, userId, callfunc) {
+function doClearingGameEnd(teamObject, userId, callfunc) {
 	var _processTeamMember, _rtnData = {winner: 0, amount: 0, member: []};
 
 	async.series({
@@ -277,7 +277,7 @@ function doClearingGameEnd(teamObj, userId, callfunc) {
 			return callback(null);
 		},
 		calculateAndUpdate: function(callback) {
-			var _teamMemberList = teamObj.getTeamMemberList();
+			var _teamMemberList = teamObject.getTeamMemberList();
 			async.eachSeries(_teamMemberList, function(elem, cb) {
 				if (elem.userBasic.state != consts.UserState.Progress) {
 					_rtnData.amount += elem.userBasic.bet;
@@ -299,17 +299,17 @@ function doClearingGameEnd(teamObj, userId, callfunc) {
 		},
 		resetTeamInfo: function(callback) {
 			//todo: 数据初始化
-			var _teamMemberList = teamObj.getTeamMemberList();
+			var _teamMemberList = teamObject.getTeamMemberList();
 			for (var i in _teamMemberList) {
 				_teamMemberList[i].userBasic.bet = 0;
 				//todo: 清除掉线玩家
 				_teamMemberList[i].userCard = {handCard: new Array(), cardType: 0, cardState: consts.CardState.None};
 			}
 
-			var _teamBasic = teamObj.getTeamBasicInfo();
-			_teamBasic.teamBasic.bet = 0;
-			_teamBasic.teamBasic.timestamp = 0;
-			_teamBasic.teamBasic.state = consts.GameState.None;
+			var _teamBasic = teamObject.getTeamBasicInfo();
+			_teamBasic.bet = 0;
+			_teamBasic.timestamp = 0;
+			_teamBasic.state = consts.GameState.None;
 
 			return callback(null);
 		},

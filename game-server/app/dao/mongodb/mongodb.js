@@ -37,7 +37,14 @@ function getGameDBCollections(url, collections, cb) {
 
 					return callback(null);
 				})
-			}
+			},
+			game_user_account: function(callback) {
+				db.collection('game_user_account', function(error, coll){
+					if (!error) collections.game_user_account = coll;
+
+					return callback(null);
+				})
+			},
 		}, function(error, doc) {
 			return cb(null);
 		})

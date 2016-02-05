@@ -62,14 +62,24 @@ handler.prepareTeam = function(msg, session, next) {
 }
 
 handler.startTeam = function(msg, session, next) {
-	this.app.rpc.manager.teamRemote.applyStartGame(session, msg, function(error, doc) {
+	var _param = {userId: session.get('userId'),
+			teamId: session.get('teamId')};
+			
+	this.app.rpc.manager.teamRemote.applyStartGame(session, _param, function(error, doc) {
 		console.log('======>>>1002:\t', error, doc);
 		return next(null, {code: 200, msg: 'ok'});
 	})
 }
 
+/* *
+* @param: {Number} userId
+* @param: {Number} teamId
+* */
 handler.betTeam = function (msg, session, next) {
-	this.app.rpc.manager.teamRemote.applyBetGame(session, msg, function(error, doc) {
+	var _param = {userId: session.get('userId'),
+			teamId: session.get('teamId')};
+
+	this.app.rpc.manager.teamRemote.applyBetGame(session, _param, function(error, doc) {
 		console.log('======>>>1003:\t', error, doc);
 		return next(null, {code: 200, msg: 'ok'});
 	})
