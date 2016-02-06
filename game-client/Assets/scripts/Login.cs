@@ -47,6 +47,26 @@ public class Login : MonoBehaviour {
 		});
 	}
 
+	public void OnPrepareTeam(){
+		JsonObject _object = new JsonObject();
+		_object.Add ("username", "zhaoyier");
+		_object.Add ("rid", 1);
+		//Network.post ("game.gameHandler.startTeam", _object, (data)=>{
+		Network.post ("game.gameHandler.prepareTeam", _object, (data)=>{
+			Debug.Log("==========>>>005:\t"+data);
+		});
+	}
+
+	public void OnBetTeam(){
+		JsonObject _object = new JsonObject();
+		_object.Add ("username", "zhaoyier");
+		_object.Add ("rid", 1);
+		//Network.post ("game.gameHandler.startTeam", _object, (data)=>{
+		Network.post ("game.gameHandler.betTeam", _object, (data)=>{
+			Debug.Log("==========>>>005:\t"+data);
+		});
+	}
+
 	public void OnExitGame() {
 		Network._gameClient.disconnect ();
 		Application.Quit ();
