@@ -23,12 +23,12 @@ module.exports = {
 		ZHADAN: 6
 	},CardState: {
 		None: 0,
-		Bet: 1,
-		Raise: 2,
+		//Bet: 1,
+		//Raise: 2,
 		Fold: 3,
 		Abandon: 4,
 		Check: 5,
-		Compare: 6
+		//Compare: 6
 	},TeamType: {
 		None: 0,
 		Gold: 1,

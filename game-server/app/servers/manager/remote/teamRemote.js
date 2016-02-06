@@ -48,48 +48,60 @@ TeamRemote.prototype.applyBetGame = function(data, callfunc) {
 /* *
 * @param: 
 * */
-TeamRemote.prototype.applyRaiseGame = function(data, callfunc) {
-	return callfunc(error, doc);
-}
+// TeamRemote.prototype.applyRaiseGame = function(data, callfunc) {
+// 	return callfunc(error, doc);
+// }
 
 /* *
 * @param: 
 * */
 TeamRemote.prototype.applyCheckGame = function(data, callfunc) {
-	return callfunc(error, doc);
+	teamManager.applyCheckGame(data, function(error, doc) {
+		return callfunc(error, doc);
+	})
 }
 
 /* *
 * @param: 
 * */
 TeamRemote.prototype.applyAbandonGame = function(data, callfunc) {
-	return callfunc(null);
+	teamManager.applyAbandonGame(data, function(error, doc) {
+		return callfunc(error, doc);
+	})
 }
 
 /* *
 * @param: 
 * */
 TeamRemote.prototype.applyLeaveGame = function(data, callfunc) {
-	return callfunc(null);
+	teamManager.applyLeaveGame(data, function(error, doc) {
+		return callfunc(error, doc);
+	})
 }
 
 /* *
 * @param: 
 * */
 TeamRemote.prototype.applyCompareGame = function(data, callfunc) {
-	return callfunc(null);
+	teamManager.applyCompareGame(data, function(error, doc) {
+		return callfunc(error, doc);
+	})
 }
 
 /* *
 * @param: 
 * */
 TeamRemote.prototype.applyClearGame = function(data, callfunc) {
-	return callfunc(null);
+	teamManager.applyClearGame(data, function(error, doc) {
+		return callfunc(error, doc);
+	})
 }
 
 /* *
 * @param: 
 * */
 TeamRemote.prototype.applyChangeGame = function(data, callfunc) {
-	return callfunc(null);
+	teamManager.applyChangeGame(data, function(error, doc) {
+		return callfunc(error, doc);
+	})
 }

@@ -67,7 +67,7 @@ handler.applyPrepareGame = function(data, callfunc) {
 	var _teamObject = null, _rtnData = [], _userWeight = 0;
 
 	async.series({
-		queryTeamObj: function(callback) {
+		queryTeamObject: function(callback) {
 			_teamObject = gTeamObjDict[data.teamId];
 			if (!_teamObject) return callback('error team id');
 
@@ -111,7 +111,7 @@ handler.applyPrepareGame = function(data, callfunc) {
 handler.applyStartGame = function(data, callfunc) {
 	var _teamObject = null, _rtnData = [];
 	async.series({
-		queryTeamObj: function(callback) {
+		queryTeamObject: function(callback) {
 			_teamObject = gTeamObjDict[data.teamId];
 			if (!_teamObject) return callback('error team id');
 
@@ -156,25 +156,34 @@ handler.applyBetGame = function(data, callfunc) {
 	var _teamObject = null, _rtnData = [], _gameState = consts.GameState.None;
 
 	async.series({
-		queryTeamObj: function(callback) {
+		queryTeamObject: function(callback) {
 			_teamObject = gTeamObjDict[data.teamId];
 			if (!_teamObject) return callback('error team id');
 
 			return callback(null);
 		},
 		checkTeamMember: function(callback) {
+			var _teamBasicInfo = _teamObject.getTeamBasicInfo();
+			if (!_teamBasicInfo) return callback('get team basic info error');
+			if (!_teamBasicInfo.state != consts.GameState.Process) return callback('game state error');
+
 			var _teamMemberList = _teamObject.getProcessTeamMember();
 			if (_teamMemberList.length == 1) {
 				doClearingGameEnd(_teamObject, data.userId, function(error, doc) {
 					if (error) return callback(error);
+
 					_rtnData = doc; _rtnData['gameState'] = consts.GameState.Clear;
+
 					return callback(null);
 				});
-			} else if (_teamMemberList.length == 2) {
-				var _selfBasic = _teamObject.getUserBasic(data.userId);
+			} else if (_teamMemberList.length >= 2) {
+				var _selfBasic = _teamObject.getTeamUserBasic(data.userId);
 				if (!_selfBasic) return callback('can not find user information');
-				var _userBetType = utilFunc.getUserBetType(_selfBasic.userCard.cardState, data.bet);
+
+				var _userBetType = utilFunc.getUserBetType(_selfBasic.userCard.cardState, data.bet, _teamBasicInfo.betType);
 				if (_userBetType == -1) return callback('error card state or bet');
+		
+				
 				doDeductGameBet(_teamObject, data.userId, 1, function(error, doc) {
 					if (error) return callback(error);
 					_rtnData = doc; _rtnData['gameState'] = consts.GameState.Process;
@@ -189,16 +198,85 @@ handler.applyBetGame = function(data, callfunc) {
 	})
 }
 
-handler.applyRaiseGame = function(data, callfunc) {
-	return callfunc(null);
-}
-
 handler.applyCheckGame = function(data, callfunc) {
-	return callfunc(null);
+	var _teamObject = null;
+
+	async.series({
+		queryTeamObject: function(callback) {
+			_teamObject = gTeamObjDict[data.teamId];
+			if (!_teamObject) return callback('error team id');
+
+			return callback(null);
+		},
+		checkConditon: function(callback) {
+			var _teamBasicInfo = _teamObject.getTeamBasicInfo();
+			if (!_teamBasicInfo) return callback('get team basic info error');
+			if (!_teamBasicInfo.state != consts.GameState.Process) return callback('game state error');
+
+			var _teamMemberList = _teamObject.getProcessTeamMember();
+			if (_teamMemberList.length == 1) {
+				doClearingGameEnd(_teamObject, data.userId, function(error, doc) {
+					if (error) return callback(error);
+
+					//_rtnData = doc; _rtnData['gameState'] = consts.GameState.Clear;
+
+					return callback(null);
+				});
+			} else if (_teamMemberList.length >= 2) {
+				var _selfBasic = _teamObject.getTeamUserBasic(data.userId);
+				_selfBasic.userCard.cardState = consts.CardState.Check;
+				return callback(null);
+			} else {
+				return callback('online player less limit');
+			}
+		}
+	}, function(error, doc) {
+		if (error) {
+			return callfunc(error, doc);
+		} else {
+			return callfunc(error, doc);
+		}
+	})
 }
 
 handler.applyAbandonGame = function(data, callfunc) {
-	return callfunc(null);
+	var _teamObject = null;
+
+	async.series({
+		queryTeamObject: function(callback) {
+			_teamObject = gTeamObjDict[data.teamId];
+			if (!_teamObject) return callback('error team id');
+
+			return callback(null);
+		},
+		check: function(callback) {
+			var _teamBasicInfo = _teamObject.getTeamBasicInfo();
+			if (!_teamBasicInfo) return callback('get team basic info error');
+			if (!_teamBasicInfo.state != consts.GameState.Process) return callback('game state error');
+
+			var _teamMemberList = _teamObject.getProcessTeamMember();
+			if (_teamMemberList.length == 1) {
+				//结算
+				doClearingGameEnd(_teamObject, data.userId, function(error, doc) {
+					if (error) return callback(error);
+
+					//_rtnData = doc; _rtnData['gameState'] = consts.GameState.Clear;
+
+					return callback(null);
+				});
+			} else if (_teamMemberList.length == 2) {
+				//结算
+				return callback(null);
+			} else if (_teamMemberList.length >= 3) {
+				//更新状态
+				return callback(null);
+			} else {
+				return callback('online player less limit');
+			}
+		}
+	}, function(error, doc) {
+
+	})
 }
 
 handler.applyLeaveGame = function(data, callfunc) {
@@ -229,6 +307,38 @@ handler.applyChangeGame = function(data, callfunc) {
 		return func(null);
 	})
 }
+
+// handler.applyRaiseGame = function(data, callfunc) {
+// 	var _teamObject = null;
+
+// 	async.series({
+// 		checkTeamObject: function(callback) {
+// 			_teamObject = gTeamObjDict[data.teamId];
+// 			if (!_teamObject) return callback('error team id');
+
+// 			return callback(null);
+// 		},
+// 		checkUserBet: function(callback) {
+// 			var _teamMemberList = _teamObject.getProcessTeamMember();
+
+// 			if (_teamMemberList.length == 1) {
+// 				doClearingGameEnd(_teamObject, data.userId, function(error, doc) {
+// 					if (error) return callback(error);
+// 					_rtnData = doc; _rtnData['gameState'] = consts.GameState.Clear;
+// 					return callback(null);
+// 				});
+// 			} else if (_teamMemberList.length >= 2) {
+
+// 			} else {
+// 				return callback('online player less limit');
+// 			}
+// 		}
+// 	}, function(error, doc) {
+
+// 	})
+// }
+
+
 
 function getTeamObjectById (teamId) {
 	return null;

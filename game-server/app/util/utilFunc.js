@@ -41,3 +41,7 @@ handle.randomizeRateWeight = function (config) {
 
 	return 1;
 }
+
+handle.getUserBetType = function(cardState, amount) {
+	return 1;
+}

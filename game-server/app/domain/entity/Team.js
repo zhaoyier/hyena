@@ -18,6 +18,7 @@ function Team(teamId, teamType) {
 		timestamp: 0, 	//todo: 
 		teamId: teamId, 
 		teamType: teamType, 
+		betType: 0,
 		bet: 0
 	};	//记录游戏状态
 	this.channel = this.createChannel(teamId);
@@ -110,7 +111,7 @@ Team.prototype.updateTeamMemberBasic = function(data) {
 	}
 }
 
-Team.prototype.getUserBasic = function() {
+Team.prototype.getTeamUserBasic = function() {
 	for (var i in this.teamMemberArray) {
 		if (this.teamMemberArray[i].userId == data.userId) return this.teamMemberArray[i];
 	}
