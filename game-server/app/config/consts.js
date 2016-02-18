@@ -26,8 +26,9 @@ module.exports = {
 		//Bet: 1,
 		//Raise: 2,
 		Fold: 3,
-		Abandon: 4,
-		Check: 5,
+		Check: 4,
+		Abandon: 5,
+		Leave: 6,
 		//Compare: 6
 	},TeamType: {
 		None: 0,

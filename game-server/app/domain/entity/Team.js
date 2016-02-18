@@ -14,7 +14,8 @@ var MAX_MEMBER_NUM = 3;
 function Team(teamId, teamType) {
 	this.cardService = new Card();
 	this.teamMemberArray = new Array();
-	this.teamBasic = {state: consts.GameState.None, //状态
+	this.teamBasic = {
+		state: consts.GameState.None, //状态
 		timestamp: 0, 	//todo: 
 		teamId: teamId, 
 		teamType: teamType, 
@@ -50,15 +51,15 @@ Team.prototype.addPlayer = function(data) {
 		//userBasic: {name: 'admin', gold: 99, diamond: 99, avatar: '001', state: consts.UserState.None, lastHeart: Date.now(), server: data.serverId, device: data.device},	//todo
 		//userBasic: {state: consts.UserState.None, activeTime: Date.now()/1000|0, gold: 100, diamond: 100, bet: 0},
 		userBasic: {
-			placeId: _placeId,
-			username: data.basic.username, 
-			avatar: data.basic.avatar, //头像
-			state: consts.UserState.None, //游戏状态
-			activeTime: Date.now()/1000|0, //状态更新时间
-			gold: data.basic.gold,
-			diamond: data.basic.diamond,
-			weight: 0, //权重
-			bet: 0 		//
+			placeId: _placeId,					//座位号
+			username: data.basic.username, 		//
+			avatar: data.basic.avatar, 			//头像
+			state: consts.UserState.None, 		//游戏状态
+			activeTime: Date.now()/1000|0, 		//状态更新时间
+			gold: data.basic.gold,				//
+			diamond: data.basic.diamond,		//
+			weight: 0, 							//权重
+			bet: 0 								//
 		},
 		//userBasic: initUserBasic(),
 		userCard: {userCard: new Array(), cardType: 0, cardState: consts.CardState.None/*出牌状态*/},
@@ -111,7 +112,7 @@ Team.prototype.updateTeamMemberBasic = function(data) {
 	}
 }
 
-Team.prototype.getTeamUserBasic = function() {
+Team.prototype.getTeamUserBasic = function(data) {
 	for (var i in this.teamMemberArray) {
 		if (this.teamMemberArray[i].userId == data.userId) return this.teamMemberArray[i];
 	}
@@ -134,6 +135,15 @@ Team.prototype.getNewPlace = function() {
 
 Team.prototype.getNextPlayer = function() {
 
+}
+
+Team.prototype.getCompareUserCard = function(home, away) {
+	var _homeBasic = this.getTeamUserBasic(home.userId);
+	if (_homeBasic == null) return null;
+	var _awayBasic = this.getTeamUserBasic(away.userId);
+	if (_awayBasic == null) return null;
+
+	return this.cardService.compareUserCard(_homeBasic.userCard, _awayBasic.userCard);
 }
 
 // Team.prototype.updateTeamMemberBet = function() {

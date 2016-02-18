@@ -91,11 +91,11 @@ TeamRemote.prototype.applyCompareGame = function(data, callfunc) {
 /* *
 * @param: 
 * */
-TeamRemote.prototype.applyClearGame = function(data, callfunc) {
-	teamManager.applyClearGame(data, function(error, doc) {
-		return callfunc(error, doc);
-	})
-}
+// TeamRemote.prototype.applyClearGame = function(data, callfunc) {
+// 	teamManager.applyClearGame(data, function(error, doc) {
+// 		return callfunc(error, doc);
+// 	})
+// }
 
 /* *
 * @param: 

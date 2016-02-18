@@ -45,3 +45,13 @@ handle.randomizeRateWeight = function (config) {
 handle.getUserBetType = function(cardState, amount) {
 	return 1;
 }
+
+handle.getArrayMaxNumber = function(array) {
+	if (!Array.isArray(array)) return null;
+
+	var _maxNumber = null;
+	for (var i in array) {
+		if (array[i] > _maxNumber) _maxNumber = array[i];
+	}
+	return _maxNumber;
+}

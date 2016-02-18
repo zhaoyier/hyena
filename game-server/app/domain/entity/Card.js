@@ -1,5 +1,6 @@
 var async = require('async');
 
+var utilFunc = require('../../util/utilFunc');
 //var utilFunc = require('./UtilityFunction');
 
 module.exports = Card;
@@ -46,7 +47,7 @@ Card.prototype.initCard = function(cardType) {
 		}
 
 		if (_selectCardList && _selectCardList.length == 3) {
-			return _selectCardList;
+			return _selectCardList.sort();
 		}
 	}
 
@@ -56,7 +57,7 @@ Card.prototype.initCard = function(cardType) {
 //选择一种花色
 Card.prototype.selectOneColor = function() {
 	var _random = (Math.random()*this.colorNum|0)+1;
-	return [_random, _random, _random]
+	return [_random, _random, _random];
 }
 //选择两种花色
 Card.prototype.selectTwoColor = function() {
@@ -76,6 +77,28 @@ Card.prototype.selectThreeColor = function() {
 	var _tempColor = [1, 2, 3, 4];
 	_tempColor.splice((Math.random()*this.colorNum|0), 1);
 	return _tempColor;
+}
+
+Card.prototype.compareUserCard = function(home, away) {
+	if (typeof(home) != 'object'|| typeof(away) != 'object') return null;
+
+	if (home.cardType != away.cardType) {
+		if (home.cardType > away.cardType) return true;
+		if (home.cardType < away.cardType) return false;
+	} else {
+		if (getCardSize(home.userCard[2]) != getCardSize(away.userCard[2])) {
+			if (getCardSize(home.userCard[2]) > getCardSize(away.userCard[2])) return true;
+			if (getCardSize(home.userCard[2]) < getCardSize(away.userCard[2])) return false;
+		} else if (getCardSize(home.userCard[1]) != getCardSize(away.userCard[1])) {
+			if (getCardSize(home.userCard[1]) > getCardSize(away.userCard[1])) return true;
+			if (getCardSize(home.userCard[1]) < getCardSize(away.userCard[1])) return false;
+		} else if (getCardSize(home.userCard[0]) != getCardSize(away.userCard[0])) {
+			if (getCardSize(home.userCard[0]) > getCardSize(away.userCard[0])) return true;
+			if (getCardSize(home.userCard[0]) < getCardSize(away.userCard[0])) return false;
+		} else {
+			return false;
+		}
+	}
 }
 
 var selectOneCard = function(service, cardColor) {

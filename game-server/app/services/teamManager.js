@@ -249,7 +249,7 @@ handler.applyAbandonGame = function(data, callfunc) {
 
 			return callback(null);
 		},
-		check: function(callback) {
+		checkConditon: function(callback) {
 			var _teamBasicInfo = _teamObject.getTeamBasicInfo();
 			if (!_teamBasicInfo) return callback('get team basic info error');
 			if (!_teamBasicInfo.state != consts.GameState.Process) return callback('game state error');
@@ -265,11 +265,76 @@ handler.applyAbandonGame = function(data, callfunc) {
 					return callback(null);
 				});
 			} else if (_teamMemberList.length == 2) {
-				//结算
-				return callback(null);
+				//修改状态，结算
+				var _selfBasic = _teamObject.getTeamUserBasic(data.userId);
+				_selfBasic.userCard.cardState = consts.CardState.Abandon;
+
+				doClearingGameEnd(_teamObject, data.userId, function(error, doc) {
+					if (error) return callback(error);
+
+					//_rtnData = doc; _rtnData['gameState'] = consts.GameState.Clear;
+
+					return callback(null);
+				});
 			} else if (_teamMemberList.length >= 3) {
 				//更新状态
+				var _selfBasic = _teamObject.getTeamUserBasic(data.userId);
+				_selfBasic.userCard.cardState = consts.CardState.Abandon;
+
+				_teamObject.pushAbandonMsg2All({}, function(error, doc) {
+					return callback(null);
+				})
+			} else {
+				return callback('online player less limit');
+			}
+		}
+	}, function(error, doc) {
+		if (error) {
+			return callfunc(error, doc);
+		} else {
+			return callfunc(error, doc);
+		}
+	})
+}
+
+handler.applyLeaveGame = function(data, callfunc) {
+	var _teamObject = null;
+
+	async.series({
+		queryTeamObject: function(callback) {
+			_teamObject = gTeamObjDict[data.teamId];
+			if (!_teamObject) return callback('error team id');
+
+			return callback(null);
+		},
+		checkConditon: function(callback) {
+			var _teamBasicInfo = _teamObject.getTeamBasicInfo();
+			if (!_teamBasicInfo) return callback(null);
+			if (!_teamBasicInfo.state != consts.GameState.Process) return callback(null);
+
+			var _teamMemberList = _teamObject.getProcessTeamMember();
+			if (_teamMemberList.length == 1) {
+				delete gTeamObjDict[data.teamId];
 				return callback(null);
+			} else if (_teamMemberList.length == 2) {
+				//更新状态、结算
+				var _selfBasic = _teamObject.getTeamUserBasic(data.userId);
+				_selfBasic.userCard.cardState = consts.CardState.Abandon;
+
+				doClearingGameEnd(_teamObject, data.userId, function(error, doc) {
+					if (error) return callback(error);
+
+					//_rtnData = doc; _rtnData['gameState'] = consts.GameState.Clear;
+
+					return callback(null);
+				});
+			} else if (_teamMemberList.length >= 3) {
+				var _selfBasic = _teamObject.getTeamUserBasic(data.userId);
+				_selfBasic.userCard.cardState = consts.CardState.Abandon;
+
+				_teamObject.pushLeaveMsg2All({}, function(error, doc) {
+					return callback(null);
+				})				
 			} else {
 				return callback('online player less limit');
 			}
@@ -279,12 +344,58 @@ handler.applyAbandonGame = function(data, callfunc) {
 	})
 }
 
-handler.applyLeaveGame = function(data, callfunc) {
-	return callfunc(null);
-}
-
 handler.applyCompareGame = function(data, callfunc) {
-	return callfunc(null);
+	var _teamObject = null, _rtnData = {};
+
+	async.series({
+		queryTeamObject: function(callback) {
+			_teamObject = gTeamObjDict[data.teamId];
+			if (!_teamObject) return callback('error team id');
+
+			return callback(null);
+		},
+		checkConditon: function(callback) {
+			var _teamMemberList = _teamObject.getProcessTeamMember();
+			if (_teamMemberList.length == 1) {
+				doClearingGameEnd(_teamObject, data.userId, function(error, doc) {
+					if (error) return callback(error);
+
+					//_rtnData = doc; _rtnData['gameState'] = consts.GameState.Clear;
+
+					return callback(null);
+				});
+			} else if (_teamMemberList.length >= 2) {
+				var _compareResult = _teamObject.getCompareUserCard({userId: data.userId}, {userId: data.awayId});
+				if (_compareResult == null) return callback('error data');
+
+				if (_compareResult == true) {
+					_rtnData = {userId: data.userId, awayId: data.awayId, winner: data.userId};
+					var _teamUserBasic = _teamObject.getTeamUserBasic({userId: data.userId});
+					if (!_teamUserBasic) return callback('error not find user basic info');
+
+					_teamUserBasic.userBasic.state = consts.CardState.Abandon;
+				} else {
+					_rtnData = {userId: data.userId, awayId: data.awayId, winner: data.awayId};
+					var _teamUserBasic = _teamObject.getTeamUserBasic({userId: data.awayId});
+					if (!_teamUserBasic) return callback('error not find user basic info');
+
+					_teamUserBasic.userBasic.state = consts.CardState.Abandon;
+				}
+
+				_teamObject.pushCompareMsg2All({}, function(error, doc) {
+					return callback(null);
+				})
+			} else {
+				return callback('online player less limit');
+			}
+		}
+	}, function(error, doc) {
+		if (error) {
+			return callfunc(error, doc);
+		} else {
+			return callfunc(error, {});
+		}
+	})
 }
 
 handler.applyClearGame = function(data, callfunc) {
