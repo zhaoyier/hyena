@@ -76,6 +76,11 @@ handler.applyPrepareGame = function(data, callfunc) {
 
 			return callback(null);
 		},
+		checkTeamCondition: function(callback) {
+			//检查玩家余额是否符合游戏要求
+			//满足两个举手玩家后开始计时，超过一定时间后拒绝新玩家的举手并开始游戏
+			return callback(null);
+		},
 		initUserCard: function(callback) {
 			//todo: 计算该玩家的权重之，分配牌型
 			var _weightScore = utilFunc.getUserWeightScore();
