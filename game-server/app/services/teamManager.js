@@ -63,6 +63,7 @@ handler.applyJoinTeam = function(data, callfunc) {
 }
 
 //准备开始
+
 handler.applyPrepareGame = function(data, callfunc) {
 	var _teamObject = null, _rtnData = [], _userWeight = 0;
 
@@ -71,8 +72,8 @@ handler.applyPrepareGame = function(data, callfunc) {
 			_teamObject = gTeamObjDict[data.teamId];
 			if (!_teamObject) return callback('error team id');
 
-			var _processTeamMember = _teamObject.getProcessTeamMember();
-			if (_processTeamMember.length < 2) return callback("less limit member");
+			var _teamMemberList = _teamObject.getTeamMemberList();
+			if (_teamMemberList.length < 2) return callback("less limit member");
 
 			return callback(null);
 		},

@@ -81,6 +81,7 @@ handler.exit = function(msg, session, next) {
  *
  */
 var onUserLeave = function(app, session, reason) {
+	console.log('=======>>>10009:\t', onUserLeave);
 	return ;
 }
 
