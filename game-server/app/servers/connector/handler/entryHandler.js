@@ -28,14 +28,16 @@ handler.login = function(msg, session, next) {
 		},
 		checkUsernameAndPwd: function(callback) {
 			userDao.checkUsernameAndPwd(msg, function(error, doc) {
-				if (doc == false) return callback(null);
+				if (error) return callback(error);
 
-				_userId = doc._id;
+				_userId = doc;
+
 				return callback(false);
 			})
 		},
 		recordUserBasic: function(callback) {
-			session.set('deviceId', msg.deviceId); //todo: 设备类型
+			//todo: 打印日志
+			//session.set('deviceId', msg.deviceId); //todo: 设备类型
 			session.set('serverId', _self.app.get('serverId')); //todo: client上传或重新计算
             session.set('username', msg.username);
             session.set('userId', _userId); //todo: 查询数据库返回
@@ -81,7 +83,7 @@ handler.exit = function(msg, session, next) {
  *
  */
 var onUserLeave = function(app, session, reason) {
-	console.log('=======>>>10009:\t', onUserLeave);
+	//todo: 处理玩家退出游戏
 	return ;
 }
 

@@ -7,7 +7,7 @@ var userDao = module.exports;
 * game_user
 * game_user_account		//账户
 * game_recharge_history
-* 
+* game_login_log
 * 
 * 
 * */
@@ -16,10 +16,49 @@ var userDao = module.exports;
 *
 * */
 userDao.checkUsernameAndPwd = function(data, callfunc) {
-	pomelo.app.get('dbclient').game_user.findAndModify({username: data.username, password: data.password}, [['_id', 1]], {$set: {lastLogin: Date.now()/1000|0}}, {}, function(error, doc) {
-		if (error || !doc) return callback(error, doc);
+	// pomelo.app.get('dbclient').game_user.findAndModify({username: data.username, password: data.password}, [['_id', 1]], {$set: {lastLogin: Date.now()/1000|0}}, {}, function(error, doc) {
+	// 	if (error || !doc) return callback(error, doc);
 
-		return callfunc(null, doc.value);
+	// 	return callfunc(null, doc.value);
+	// })
+	var _userId = 0;
+
+	async.series({
+		checkData: function(callback) {
+			pomelo.app.get('dbclient').game_user.findOne({username: data.username, password: data.password}, function(error, doc) {
+				if (error) return callback('mongodb error');
+
+				if (!doc) return callback('error username or password');
+
+				_userId = doc._id;
+
+				return callback(null);
+			})
+		},
+		updateData: function(callback) {
+			pomelo.app.get('dbclient').game_login_log.save({u: data.username, ct: Date.now()/1000|0}, function(error, doc) {
+				if (error) return callback(error);
+
+				return callback(null);
+			})
+		}
+	}, function(error, doc) {
+		return callback(error, _userId);
+	})
+}
+
+userDao.queryUserBalance = function(data, callfunc) {
+	pomelo.app.get('dbclient').game_user_account.findOne({_id: data.userId}, function(error, doc) {
+		if (error) return callback(error);
+
+		if (!doc) return callback(null, 0);
+
+		//todo:
+		if (data.teamType = 0) {
+			return callback(null, doc.gold);
+		} else {
+			return callback(null, doc.diamond);
+		}
 	})
 }
 

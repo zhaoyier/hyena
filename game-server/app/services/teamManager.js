@@ -25,7 +25,7 @@ var ACTIVE_USER_TIME = 100;
 * @api public
 * */
 handler.applyJoinTeam = function(data, callfunc) {
-	var _teamObject = null;
+	var _teamObject = null, _userBalance = 0;
 	var _rtnData = {teamId: 0, member: []};
 
 	async.series({
@@ -34,12 +34,26 @@ handler.applyJoinTeam = function(data, callfunc) {
 
 			return callback(null);
 		},
-		addToTeam: function(callback) {
-			_teamObject = getHasPositionTeam(data.teamType) || new Team(++gTeamId, data.teamType);
+		checkFreeTeam: function(callback) {
+			_teamObject = getHasPositionTeam(data.teamType);
 
-			if (!_teamObject) return callback('create team error');
+			if (!_teamObject) _teamObject = new Team(++gTeamId, data.teamType);
 
-			if (!_teamObject.addPlayer(data)) return callback('add player error');
+			if (!_teamObject) return callback('find or create team error');
+
+			return callback(null);
+		},
+		queryBalance: function(callback) {
+			userDao.queryUserBalance({userId: data.userId, teamType: data.teamType}, function(error, doc) {
+				if (error) return callback(error);
+
+				_userBalance = doc;
+				return callback(null);
+			})
+		},
+		joinTeam: function(callback) {
+			var _addStatus = _teamObject.addPlayer(data);
+			if (!_addStatus) return callback('add player error');
 
 			var _teamId = _teamObject.getTeamBasicInfo().teamId;
 
@@ -47,11 +61,12 @@ handler.applyJoinTeam = function(data, callfunc) {
 
 			_rtnData.teamId = _teamId;
 			_rtnData.member = _teamObject.getTeamMemberBasic();
-
 			return callback(null);
 		},
 		pushMessage: function(callback) {
-			return callback(null);
+			_teamObject.pushJoinMsg2All({userId: data.userId, username: 'admin', balance: _userBalance, avata: 'temp'}, function(error, doc) {
+				return callback(null);
+			})
 		}
 	}, function(error, doc) {
 		if (error) {
@@ -72,35 +87,66 @@ handler.applyPrepareGame = function(data, callfunc) {
 			_teamObject = gTeamObjDict[data.teamId];
 			if (!_teamObject) return callback('error team id');
 
-			var _teamMemberList = _teamObject.getTeamMemberList();
-			if (_teamMemberList.length < 2) return callback("less limit member");
+			var _teamOnlineMemberList = _teamObject.getOnlineTeamMember();
+			if (_teamOnlineMemberList.length < 2) return callback("less limit member");
 
 			return callback(null);
 		},
 		checkTeamCondition: function(callback) {
 			//检查玩家余额是否符合游戏要求
-			//满足两个举手玩家后开始计时，超过一定时间后拒绝新玩家的举手并开始游戏
+			userDao.queryUserBalance({userId: data.userId, teamType: data.teamType}, function(error, doc) {
+				if (error) return callback(error);
+				//todo: 
+				if (doc < 100) return callback('insufficient balance');
+
+				return callback(null);
+			}
+
 			return callback(null);
 		},
 		initUserCard: function(callback) {
-			//todo: 计算该玩家的权重之，分配牌型
+			//todo: 计算该玩家的权重值，分配牌型
 			var _weightScore = utilFunc.getUserWeightScore();
 			_userWeight = utilFunc.getUserCardType(_weightScore);
+
+			var _teamUserBasic = _teamObject.getTeamUserBasic({userId: data.userId});
+			_teamUserBasic.userBasic.weight = _userWeight;
+			_teamUserBasic.userBasic.state = consts.UserState.Ready;
+			_teamUserBasic.userBasic.activeTime = Date.now()/1000|0;
+
+			// var _teamMemberList = _teamObject.getTeamMemberList();
+			// for (var i in _teamMemberList) {
+			// 	if (_teamMemberList[i].userId == data.userId) {
+			// 		_rtnData.push(data.userId);
+			// 		_teamMemberList[i].userBasic.weight = _userWeight;
+			// 		_teamMemberList[i].userBasic.state = consts.UserState.Ready;
+			// 		_teamMemberList[i].userBasic.activeTime = Date.now()/1000|0;
+			// 	}
+			// 	//todo: 是否需要加入其他返回数据
+			// 	_rtnData.push({userId: _teamMemberList[i].userId, state: _teamMemberList[i].userBasic.state}); 
+			// }
+			return callback(null);
+		},
+		checkConditon: function(callback) {
+			//如果举手人数满足最小条件，那么准备开始游戏
+			var _teamReadyNum = 0;
 			var _teamMemberList = _teamObject.getTeamMemberList();
 			for (var i in _teamMemberList) {
-				if (_teamMemberList[i].userId == data.userId) {
-					_rtnData.push(data.userId);
-					_teamMemberList[i].userBasic.weight = _userWeight;
-					_teamMemberList[i].userBasic.state = consts.UserState.Ready;
-					_teamMemberList[i].userBasic.activeTime = Date.now()/1000|0;
-				}
-				//todo: 是否需要加入其他返回数据
-				_rtnData.push({userId: _teamMemberList[i].userId, state: _teamMemberList[i].userBasic.state}); 
+				if (_teamMemberList[i].userBasic.state == consts.UserState.Ready) ++_teamReadyNum;
 			}
+
+			if (_teamReadyNum >= 2) {
+				var _teamBasicInfo = _teamObject.getTeamBasicInfo();
+				_teamBasicInfo.state = consts.GameState.Wait;
+				_teamBasicInfo.timestamp = Date.now()/1000|0;
+			}
+
 			return callback(null);
 		},
 		pushMessage: function(callback) {
-			return callback(null);
+			_teamObject.pushPrepareMsg2All({userId: data.userId}, function(){
+				return callback(null);
+			})
 		}
 	}, function(error, doc) {
 		if (error) {
@@ -120,6 +166,13 @@ handler.applyStartGame = function(data, callfunc) {
 		queryTeamObject: function(callback) {
 			_teamObject = gTeamObjDict[data.teamId];
 			if (!_teamObject) return callback('error team id');
+
+			return callback(null);
+		},
+		checkConditon: function(callback) {
+			var _teamBasicInfo = _teamObject.getTeamBasicInfo();
+			if (_teamBasicInfo.state != consts.GameState.Wait) return callback('game state error');
+			if ((Date.now()/1000|0) - _teamBasicInfo.timestamp <= 5) return callback('game wait state, can not start game');
 
 			return callback(null);
 		},
@@ -147,7 +200,9 @@ handler.applyStartGame = function(data, callfunc) {
 			return callback(null);
 		},
 		pushMessage: function(callback) {
-			_teamObject.pushStartMsg2All(_rtnData, callback);
+			_teamObject.pushStartMsg2All(_rtnData, function(){
+				return callback(null);
+			});
 		}
 	}, function(error, doc) {
 		if (error) {

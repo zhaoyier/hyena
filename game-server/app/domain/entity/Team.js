@@ -91,13 +91,23 @@ Team.prototype.getTeamMemberBasic = function() {
 	return _temp;
 }
 
-Team.prototype.getProcessTeamMember = function() {
-	var _activeMember = [];
+Team.prototype.getOnlineTeamMember = function() {
+	var _onlineMembers = [];
+
 	for (var i in this.teamMemberArray) {
-		if (this.teamMemberArray[i].userBasic.state == consts.UserState.Progress) _activeMember.push(this.teamMemberArray[i]);
+		if (this.teamMemberArray[i].userBasic.state == consts.UserState.None) _onlineMembers.push(this.teamMemberArray[i]);
 	}
 
-	return _activeMember;
+	return _onlineMembers;
+}
+
+Team.prototype.getProcessTeamMember = function() {
+	var _activeMembers = [];
+	for (var i in this.teamMemberArray) {
+		if (this.teamMemberArray[i].userBasic.state == consts.UserState.Progress) _activeMembers.push(this.teamMemberArray[i]);
+	}
+
+	return _activeMembers;
 }
 
 Team.prototype.initUserCard = function(userWeight) {
@@ -124,7 +134,7 @@ Team.prototype.getNewPlace = function() {
 	var _placeNumber = 0;
 
 	while (_placeNumber <= MAX_MEMBER_NUM) {
-		var _hasFind = false, ++_placeNumber;
+		var _hasFind = false; ++_placeNumber;
 		for (var i in this.teamMemberArray) {
 			if (this.teamMemberArray[i].userBasic.placeId == _placeNumber) _hasFind = true;
 		}
@@ -155,6 +165,33 @@ Team.prototype.getCompareUserCard = function(home, away) {
 
 // 	}
 // }
+
+//通知开始
+Team.prototype.pushJoinMsg2All = function(data, callfunc) {
+	//todo: 判断和修改游戏状态
+	if (this.teamBasic.state == consts.GameState.None) {
+		//this.teamBasic.state = consts.GameState.Start;
+		this.teamBasic.timestamp = Date.now()/1000|0;
+
+		this.channel.pushMessage('onJoinTeam', {}, callfunc);
+	} else {
+		return callfunc('team state error start');
+	}
+}
+
+//通知准备
+Team.prototype.pushPrepareMsg2All = function(data, callfunc) {
+	//todo: 判断和修改游戏状态
+	if (this.teamBasic.state == consts.GameState.None) {
+		this.teamBasic.state = consts.GameState.Wait;
+		this.teamBasic.timestamp = Date.now()/1000|0;
+
+		this.channel.pushMessage('onPrepareTeam', {}, callfunc);
+	} else {
+		return callfunc('team state error start');
+	}
+}
+
 
 //通知开始
 Team.prototype.pushStartMsg2All = function(data, callfunc) {

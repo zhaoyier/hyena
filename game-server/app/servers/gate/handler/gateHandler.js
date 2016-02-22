@@ -19,27 +19,12 @@ var handler = Handler.prototype;
  *
  */
 handler.queryEntry = function(msg, session, next) {
-	var uid = msg.uid;
-	if(!uid) {
-		next(null, {
-			code: 500
-		});
-		return;
+	var _connectors = this.app.getServersByType('connector');
+
+	if (!_connectors || _connectors.length === 0) {
+		return next(null, {code: 500});
 	}
-	// get all connectors
-	var connectors = this.app.getServersByType('connector');
-	console.log('=======>>>1002:\t', connectors, !connectors);
-	if(!connectors || connectors.length === 0) {
-		next(null, {
-			code: 500
-		});
-		return;
-	}
-	// select connector
-	var res = dispatcher.dispatch(uid, connectors);
-	next(null, {
-		code: 200,
-		host: res.host,
-		port: res.clientPort
-	});
+
+	var _connector = dispatcher.randomDispatch(_connectors);
+	return next(null, {code: 200, host: _connector.host, port: _connector.clientPort});
 };

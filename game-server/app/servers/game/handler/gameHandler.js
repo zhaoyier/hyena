@@ -17,34 +17,38 @@ var handler = Handler.prototype;
 * @argument: msg: {teamType}
 * */
 handler.joinTeam = function(msg, session, next) {
-	var _self = this;
 	var _param = {userId: session.get('userId'), 
 				serverId: session.get('serverId'), 
 				teamType: msg.teamType};
 
-	var _rtnData = {};
+	this.app.rpc.manager.teamRemote.applyJoinTeam(session, _param, function(error, doc) {
+		return next(null, {code: 200, msg: 'ok'});
+	});
 
-	async.series({
-		queryUserBasic: function(callback) {
-			userDao.queryUserBasic({userId: session.get('userId')}, function(error, doc) {
-				if (error) return callback('201');
+	//var _self = this;
+	//var _rtnData = {};
 
-				_param['basic'] = doc;
-				return callback(null);
-			})
-		},
-		applyJoinTeam: function(callback) {
-			_self.app.rpc.manager.teamRemote.applyJoinTeam(session, _param, function(error, doc) {
-				if (error) return callback('202');
+	// async.series({
+	// 	queryUserBasic: function(callback) {
+	// 		userDao.queryUserBasic({userId: session.get('userId')}, function(error, doc) {
+	// 			if (error) return callback('201');
 
-				_rtnData = doc;
-				session.set('teamId', doc.teamId);
-				session.pushAll(callback);
-			})
-		}
-	}, function(error, doc) {
-		return next(null, {code: 200, msg: _rtnData});
-	})
+	// 			_param['basic'] = doc;
+	// 			return callback(null);
+	// 		})
+	// 	},
+	// 	applyJoinTeam: function(callback) {
+	// 		_self.app.rpc.manager.teamRemote.applyJoinTeam(session, _param, function(error, doc) {
+	// 			if (error) return callback('202');
+
+	// 			_rtnData = doc;
+	// 			session.set('teamId', doc.teamId);
+	// 			session.pushAll(callback);
+	// 		})
+	// 	}
+	// }, function(error, doc) {
+	// 	return next(null, {code: 200, msg: _rtnData});
+	// })
 }
 
 /* *
