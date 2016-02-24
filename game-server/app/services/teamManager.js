@@ -170,6 +170,7 @@ handler.applyStartGame = function(data, callfunc) {
 			return callback(null);
 		},
 		checkConditon: function(callback) {
+			//检查是否满足开始条件
 			var _teamBasicInfo = _teamObject.getTeamBasicInfo();
 			if (_teamBasicInfo.state != consts.GameState.Wait) return callback('game state error');
 			if ((Date.now()/1000|0) - _teamBasicInfo.timestamp <= 5) return callback('game wait state, can not start game');
