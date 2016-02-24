@@ -181,6 +181,7 @@
      <Compile Include="Assets\Scripts\ChatGUI.cs" />
      <Compile Include="Assets\Scripts\ChatRecord.cs" />
      <Compile Include="Assets\Scripts\Login.cs" />
+     <Compile Include="Assets\Scripts\Login2.cs" />
      <Compile Include="Assets\Scripts\LoginGUI.cs" />
      <Compile Include="Assets\Scripts\Network.cs" />
      <Compile Include="Assets\Scripts\PomeloLib\client\EventManager.cs" />

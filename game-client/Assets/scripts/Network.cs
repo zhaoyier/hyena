@@ -12,11 +12,9 @@ public class Network {
 
 	//public delegate JsonObject callbackEventHandler();
 	public static void post(string url, JsonObject obj, Action<JsonObject> action) {
-		//getGameServerList ((data) => {
 		if (_gameClient == null) {
 			getGameServerHandler ((handler) => {
 				_gameClient = handler;
-				Debug.Log("========>>002");
 				_gameClient.request(url, obj, action);
 			});
 		} else {
@@ -26,7 +24,7 @@ public class Network {
 
 	public static void getGameServerHandler(Action<PomeloClient> action) {
 		getGameServerList ((list) => {
-			Debug.Log("========>>1002:\t"+list);
+			Debug.Log("========>>server list:\t"+list);
 			if (Convert.ToInt32(list["code"]) == 200 ) {
 				_gameClient.disconnect();
 				_gameClient = new PomeloClient((string)list["host"], Convert.ToInt32(list["port"]));
