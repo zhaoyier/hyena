@@ -180,6 +180,7 @@
      <Compile Include="Assets\NGUI\Scripts\UI\UIViewport.cs" />
      <Compile Include="Assets\Scripts\ChatGUI.cs" />
      <Compile Include="Assets\Scripts\ChatRecord.cs" />
+     <Compile Include="Assets\Scripts\GameProtocol.cs" />
      <Compile Include="Assets\Scripts\Login.cs" />
      <Compile Include="Assets\Scripts\Login2.cs" />
      <Compile Include="Assets\Scripts\LoginGUI.cs" />
@@ -209,6 +210,10 @@
      <Compile Include="Assets\Scripts\PomeloLib\test\transportTest\TransportTest.cs" />
      <Compile Include="Assets\Scripts\PomeloLib\transport\TransportState.cs" />
      <Compile Include="Assets\Scripts\PomeloLib\transport\Transporter.cs" />
+     <Compile Include="Assets\Scripts\SimpleJson\Properties\AssemblyInfo.cs" />
+     <Compile Include="Assets\Scripts\SimpleJson\SimpleJson.cs" />
+     <Compile Include="Assets\Scripts\main.cs" />
+     <Compile Include="Assets\Scripts\room.cs" />
      <None Include="Assets\NGUI\Examples\Shaders\Unlit - Depth Cutout.shader" />
      <None Include="Assets\NGUI\ReadMe - 3.7.0.txt" />
      <None Include="Assets\NGUI\Resources\Shaders\Unlit - Text 2.shader" />
