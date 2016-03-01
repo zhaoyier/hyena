@@ -1,9 +1,12 @@
 ﻿<Properties StartupItem="Assembly-CSharp.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Login2.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\TeamScript.cs">
     <Files>
-      <File FileName="Assets\Scripts\Login2.cs" Line="21" Column="24" />
-      <File FileName="Assets\Scripts\GameProtocol.cs" Line="9" Column="3" />
+      <File FileName="Assets\Scripts\GameMessage.cs" Line="8" Column="15" />
+      <File FileName="Assets\Scripts\SimpleJson.cs" Line="473" Column="65" />
+      <File FileName="Assets\Scripts\LoginScript.cs" Line="10" Column="2" />
+      <File FileName="Assets\Scripts\MainScript.cs" Line="21" Column="41" />
+      <File FileName="Assets\Scripts\TeamScript.cs" Line="19" Column="81" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
