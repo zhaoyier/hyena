@@ -219,18 +219,18 @@ Team.prototype.pushBetMsg2All = function(data, callfunc) {
 	}
 }
 
-Team.prototype.pushRaiseMsg2All = function(data, callfunc) {
-	//todo: 修改状态，通知
-	if (this.teamBasic.state == consts.GameState.Start 
-		|| this.teamBasic.state == consts.GameState.Process) {
-		this.teamBasic.state = consts.GameState.Process;
-		this.teamBasic.timestamp = Date.now()/1000|0;
+// Team.prototype.pushRaiseMsg2All = function(data, callfunc) {
+// 	//todo: 修改状态，通知
+// 	if (this.teamBasic.state == consts.GameState.Start 
+// 		|| this.teamBasic.state == consts.GameState.Process) {
+// 		this.teamBasic.state = consts.GameState.Process;
+// 		this.teamBasic.timestamp = Date.now()/1000|0;
 
-		this.channel.pushMessage('onRaiseTeam', {}, callfunc);
-	} else {
-		return callfunc('team state error bet');
-	}
-}
+// 		this.channel.pushMessage('onRaiseTeam', {}, callfunc);
+// 	} else {
+// 		return callfunc('team state error bet');
+// 	}
+// }
 
 Team.prototype.pushCheckMsg2All = function(data, callfunc) {
 	//todo: 修改状态，通知
@@ -284,18 +284,18 @@ Team.prototype.pushCompareMsg2All = function(data, callfunc) {
 	}
 }
 
-Team.prototype.pushClearMsg2All = function(data, callfunc) {
-	//todo: 修改状态，通知
-	if (this.teamBasic.state == consts.GameState.Start 
-		|| this.teamBasic.state == consts.GameState.Process) {
-		this.teamBasic.state = consts.GameState.Process;
-		this.teamBasic.timestamp = Date.now()/1000|0;
+// Team.prototype.pushClearMsg2All = function(data, callfunc) {
+// 	//todo: 修改状态，通知
+// 	if (this.teamBasic.state == consts.GameState.Start 
+// 		|| this.teamBasic.state == consts.GameState.Process) {
+// 		this.teamBasic.state = consts.GameState.Process;
+// 		this.teamBasic.timestamp = Date.now()/1000|0;
 
-		this.channel.pushMessage('onClearTeam', {}, callfunc);
-	} else {
-		return callfunc('team state error bet');
-	}
-}
+// 		this.channel.pushMessage('onClearTeam', {}, callfunc);
+// 	} else {
+// 		return callfunc('team state error bet');
+// 	}
+// }
 
 //通知聊天
 Team.prototype.pushChatMsg2All = function(data, callfunc) {
