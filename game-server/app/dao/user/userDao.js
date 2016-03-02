@@ -46,7 +46,7 @@ userDao.queryUserAccount = function (data, callback) {
 	pomelo.app.get('dbclient').game_user_account.findOne({_id: data.userId}, function(error, doc) {
 		if (error) return callback(error);
 
-		if (!doc) return callback(null, {diamond: doc.diamond||0, gold: doc.gold||0});
+		if (!doc) return callback(null, {diamond: 0, gold: 0});
 
 		return callback(null, {diamond: doc.diamond||0, gold: doc.gold||0});
 	})
