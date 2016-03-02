@@ -20,7 +20,7 @@ var handler = Handler.prototype;
  * @return {Void}
  */
 handler.login = function(msg, session, next) {
-	var _self = this, _userId = 0;
+	var _self = this, _rtnData = {};
 	
 	async.series({
 		checkUserToken: function(callback) {
@@ -30,9 +30,18 @@ handler.login = function(msg, session, next) {
 			userDao.checkUsernameAndPwd(msg, function(error, doc) {
 				if (error) return callback(error);
 
-				_userId = doc;
+				_rtnData.userId = doc;
 
 				return callback(false);
+			})
+		},
+		queryUserAccount: function(callback) {
+			userDao.queryUserAccount({userId: _rtnData.userId}, function(error, doc) {
+				if (error) return callback(error);
+
+				_rtnData.gold = doc.gold;
+				_rtnData.diamond = doc.diamond;
+				return callback(null);
 			})
 		},
 		recordUserBasic: function(callback) {
@@ -40,8 +49,8 @@ handler.login = function(msg, session, next) {
 			//session.set('deviceId', msg.deviceId); //todo: 设备类型
 			session.set('serverId', _self.app.get('serverId')); //todo: client上传或重新计算
             session.set('username', msg.username);
-            session.set('userId', _userId); //todo: 查询数据库返回
-            session.set('account', {gold: 1000, diamond: 1000});
+            session.set('userId', _rtnData.userId); //todo: 查询数据库返回
+            session.set('account', {gold: _rtnData.gold, diamond: _rtnData.diamond});
             session.set('match', {win: 100, lose: 100});
             session.on('closed', onUserLeave.bind(null, _self.app));
             session.pushAll(callback);

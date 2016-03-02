@@ -16,11 +16,6 @@ var userDao = module.exports;
 *
 * */
 userDao.checkUsernameAndPwd = function(data, callfunc) {
-	// pomelo.app.get('dbclient').game_user.findAndModify({username: data.username, password: data.password}, [['_id', 1]], {$set: {lastLogin: Date.now()/1000|0}}, {}, function(error, doc) {
-	// 	if (error || !doc) return callback(error, doc);
-
-	// 	return callfunc(null, doc.value);
-	// })
 	var _userId = 0;
 
 	async.series({
@@ -43,7 +38,17 @@ userDao.checkUsernameAndPwd = function(data, callfunc) {
 			})
 		}
 	}, function(error, doc) {
-		return callback(error, _userId);
+		return callfunc(error, _userId);
+	})
+}
+
+userDao.queryUserAccount = function (data, callback) {
+	pomelo.app.get('dbclient').game_user_account.findOne({_id: data.userId}, function(error, doc) {
+		if (error) return callback(error);
+
+		if (!doc) return callback(null, {diamond: doc.diamond||0, gold: doc.gold||0});
+
+		return callback(null, {diamond: doc.diamond||0, gold: doc.gold||0});
 	})
 }
 

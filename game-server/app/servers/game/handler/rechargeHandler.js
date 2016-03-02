@@ -8,6 +8,10 @@ var Handler = function(app) {
 
 var handler = Handler.prototype;
 
-handle.test = function (msg, session, next) {
+handler.getRechargeList = function (msg, session, next) {
+	return next(null, {code: 200, msg: 'helloword'});
+}
+
+handler.recharge = function (msg, session, next) {
 	return next(null, {code: 200, msg: 'helloword'});
 }
