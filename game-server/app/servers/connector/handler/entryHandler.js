@@ -64,8 +64,10 @@ handler.login = function(msg, session, next) {
 	}, function(error, doc) {
 		if (error) {
 			return next(err, {code: Code.FAIL});
+		} else {
+			return next(null, {code: 200, rtn: _rtnData});
 		}
-		next(null, {code: 200});
+		
 	})
 }
 
