@@ -100,9 +100,7 @@ handler.applyPrepareGame = function(data, callfunc) {
 				if (doc < 100) return callback('insufficient balance');
 
 				return callback(null);
-			}
-
-			return callback(null);
+			});
 		},
 		initUserCard: function(callback) {
 			//todo: 计算该玩家的权重值，分配牌型

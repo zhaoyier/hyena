@@ -45,6 +45,13 @@ function getGameDBCollections(url, collections, cb) {
 					return callback(null);
 				})
 			},
+			game_login_log: function(callback) {
+				db.collection('game_login_log', function(error, coll){
+					if (!error) collections.game_login_log = coll;
+
+					return callback(null);
+				})
+			},
 		}, function(error, doc) {
 			return cb(null);
 		})
