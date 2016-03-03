@@ -42,27 +42,27 @@ userDao.checkUsernameAndPwd = function(data, callfunc) {
 	})
 }
 
-userDao.queryUserAccount = function (data, callback) {
+userDao.queryUserAccount = function (data, callfunc) {
 	pomelo.app.get('dbclient').game_user_account.findOne({_id: data.userId}, function(error, doc) {
-		if (error) return callback(error);
+		if (error) return callfunc(error);
 
-		if (!doc) return callback(null, {diamond: 0, gold: 0});
+		if (!doc) return callfunc(null, {diamond: 0, gold: 0});
 
-		return callback(null, {diamond: doc.diamond||0, gold: doc.gold||0});
+		return callfunc(null, {diamond: doc.diamond||0, gold: doc.gold||0});
 	})
 }
 
 userDao.queryUserBalance = function(data, callfunc) {
 	pomelo.app.get('dbclient').game_user_account.findOne({_id: data.userId}, function(error, doc) {
-		if (error) return callback(error);
+		if (error) return callfunc(error);
 
-		if (!doc) return callback(null, 0);
+		if (!doc) return callfunc(null, 0);
 
 		//todo:
 		if (data.teamType = 0) {
-			return callback(null, doc.gold);
+			return callfunc(null, doc.gold);
 		} else {
-			return callback(null, doc.diamond);
+			return callfunc(null, doc.diamond);
 		}
 	})
 }
