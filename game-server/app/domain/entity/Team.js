@@ -52,12 +52,12 @@ Team.prototype.addPlayer = function(data) {
 		//userBasic: {state: consts.UserState.None, activeTime: Date.now()/1000|0, gold: 100, diamond: 100, bet: 0},
 		userBasic: {
 			placeId: _placeId,					//座位号
-			username: data.basic.username, 		//
-			avatar: data.basic.avatar, 			//头像
+			username: data.username, 		//
+			avatar: data.avatar, 			//头像
 			state: consts.UserState.None, 		//游戏状态
 			activeTime: Date.now()/1000|0, 		//状态更新时间
-			gold: data.basic.gold,				//
-			diamond: data.basic.diamond,		//
+			gold: data.gold,				//
+			diamond: data.diamond,		//
 			weight: 0, 							//权重
 			bet: 0 								//
 		},
