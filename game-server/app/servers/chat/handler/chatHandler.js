@@ -10,6 +10,10 @@ var Handler = function(app) {
 
 var handler = Handler.prototype;
 
+handler.getChat = function (msg, session, next) {
+	return next(null, {code: 200, msg: "hello word"});
+}
+
 /**
  * Send messages to users
  *

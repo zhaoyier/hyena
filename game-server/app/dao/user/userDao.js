@@ -4,7 +4,7 @@ var pomelo = require('pomelo');
 var userDao = module.exports;
 
 /* *
-* game_user
+* game_user {_id: userId, username: username, password: password, avatar: avatar}
 * game_user_account		//账户
 * game_recharge_history
 * game_login_log
@@ -42,13 +42,50 @@ userDao.checkUsernameAndPwd = function(data, callfunc) {
 	})
 }
 
+userDao.checkRegistUsername = function(data, callfunc) {
+	pomelo.app.get('dbclient').game_user.findOne({username: data.username}, function(error, doc) {
+		if (error) return callfunc(error);
+
+		return callfunc(null, !!doc);
+	})
+}
+
+userDao.registerNewPlayer = function(data, callfunc) {
+	async.series({
+		checkUsername: function(callback) {
+			pomelo.app.get('dbclient').game_user.findOne({username: data.username}, function(error, doc) {
+				if (error) return callfunc(error);
+
+				if (!!doc) return return callfunc('this username has been register');
+
+				return callback(null);
+			})
+		},
+		saveUserInfo: function(callback) {
+			pomelo.app.get('dbclient').game_user.save({username: data.username, password: data.password, avatar: data.userAvatar}, function(errpr. dpc) {
+				if (error) return callback(error);
+
+				return callback(null);
+			})
+		}
+	}, function(error, doc) {
+		return callback(error, doc);
+	})
+}
+
+
+/***********************************************/
+
+
+
+
 userDao.queryUserAccount = function (data, callfunc) {
 	pomelo.app.get('dbclient').game_user_account.findOne({_id: data.userId}, function(error, doc) {
 		if (error) return callfunc(error);
 
-		if (!doc) return callfunc(null, {diamond: 0, gold: 0});
+		if (!doc) return callfunc(null, {diamond: 0, gold: 0, avatar: ""});
 
-		return callfunc(null, {diamond: doc.diamond||0, gold: doc.gold||0});
+		return callfunc(null, {diamond: doc.diamond||0, gold: doc.gold||0, avatar: doc.avatar||""});
 	})
 }
 

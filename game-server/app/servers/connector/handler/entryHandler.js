@@ -76,17 +76,34 @@ handler.register = function (msg, session, next) {
 		checkRule: function(callback) {
 			if (typeof(msg.username) != 'string') return callback('username must be string');
 
-			if (msg.username.length <= 6) return callback('error');
+			if (msg.username.length < 6) return callback('uesrname less ');
 
 			if (msg.username.search(/\s/) != -1) return callback('username can not contain empty character');
+
+			if (msg.password.length < 6) return callback('password less ');
+
+			if (msg.repassword.length < 6) return callback('repassword less');
+
+			if (msg.password != msg.repassword) return callback('password != repassword');
 
 			return callback(null);
 		},
 		checkRepeat: function(callback) {
-			return callback(null);
+			userDao.checkRegistUsername({username: msg.username}, function(error, doc) {
+				if (error) return callback('db error');
+
+				if (doc == true) return callback('username repeat');
+
+				return callback(null);
+			})
 		},
 		registerUser: function(callback) {
-			return callback(null);
+			if (!msg.avatar) msg.avatar = '1';
+			userDao.registerNewPlayer({username: msg.username, password: msg.password, avatar: msg.avatar}, function(error, doc) {
+				if (error) return  callback(error);
+
+				return callback(null);
+			})
 		}
 	}, function(error, doc) {
 		return next(null, {code: 200});
