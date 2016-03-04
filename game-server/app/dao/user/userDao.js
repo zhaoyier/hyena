@@ -56,7 +56,7 @@ userDao.registerNewPlayer = function(data, callfunc) {
 			pomelo.app.get('dbclient').game_user.findOne({username: data.username}, function(error, doc) {
 				if (error) return callfunc(error);
 
-				if (!!doc) return return callfunc('this username has been register');
+				if (!!doc) return callfunc('this username has been register');
 
 				return callback(null);
 			})
