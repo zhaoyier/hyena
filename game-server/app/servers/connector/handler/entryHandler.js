@@ -106,7 +106,12 @@ handler.register = function (msg, session, next) {
 			})
 		}
 	}, function(error, doc) {
-		return next(null, {code: 200});
+		if (error) {
+			return next(null, {code: 201});
+		} else {
+			return next(null, {code: 200});
+		}
+		
 	})
 }
 
