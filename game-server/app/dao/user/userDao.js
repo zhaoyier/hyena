@@ -62,7 +62,7 @@ userDao.registerNewPlayer = function(data, callfunc) {
 			})
 		},
 		saveUserInfo: function(callback) {
-			pomelo.app.get('dbclient').game_user.save({username: data.username, password: data.password, avatar: data.userAvatar}, function(errpr. dpc) {
+			pomelo.app.get('dbclient').game_user.save({username: data.username, password: data.password, avatar: data.userAvatar}, function(error, dpc) {
 				if (error) return callback(error);
 
 				return callback(null);
