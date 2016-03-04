@@ -69,7 +69,7 @@ userDao.registerNewPlayer = function(data, callfunc) {
 			})
 		}
 	}, function(error, doc) {
-		return callback(error, doc);
+		return callfunc(error, doc);
 	})
 }
 
