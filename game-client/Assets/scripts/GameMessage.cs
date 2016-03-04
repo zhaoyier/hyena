@@ -5,35 +5,51 @@ using System.Collections;
 using System.Runtime.Serialization;
 
 namespace GameMessage {
-	enum TeamEnum: int{
+	enum TeamEnum{
 		A = 1,
 		B = 2
 	}
 
-	class LoginRequest {
+	enum PositionEnum {
+		TOP_LEFT = 1,
+		LOWER_LEFT = 2,
+		CENTRAL = 3,
+		LOWER_RIGHT = 4,
+		TOP_RIGHT = 5
+	}
+
+	public class LoginRequest {
 		public string username { set; get;}
 		public string password { set; get;}
 	}
 
-	class LoginResponse {
+	public class LoginResponse {
 		public int code{ set; get;}
 		public int userId { set; get;}
 	}
 
-	class RegisterRequest {
+	public class RegisterRequest {
 		
 	}
 
-	class RegisterResponse {
+	public class RegisterResponse {
 		
 	}
 
-	class SelectTeamRequest {
+	public class SelectTeamRequest {
 		public int teamType { set; get;}
 	}
 
-	class SelectTeamResponse {
+	public class SelectTeamResponse {
 		
+	}
+
+	public class UserBasic {
+		public int userId { set; get;}
+		public int userBalance{ set; get;}
+		public int userPosition { set; get;}
+		public string username { set; get;}
+		public string userAvatar{ set; get;}
 	}
 
 	class Serialize {

@@ -42,7 +42,7 @@ public class Network {
 		_gameClient = new PomeloClient (_gateHost, _gatePort);
 		_gameClient.connect (null, (data)=>{
 			JsonObject msg = new JsonObject();
-			msg["uid"] = "admin";
+			msg["uid"] = System.Guid.NewGuid().ToString();
 
 			_gameClient.request("gate.gateHandler.queryEntry", msg, action);
 		});
