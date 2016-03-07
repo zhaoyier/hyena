@@ -10,9 +10,6 @@
         "gate":[
 	       {"id": "gate-server-1", "host": "10.96.36.181", "clientPort": 3014, "frontend": true}
 	    ],
-        "game":[
-            {"id":"game-server-1", "host":"10.96.36.181", "port":8050}
-        ],
         "manager":[
             {"id":"manager-server-1", "host":"10.96.36.181", "port":8060}
         ]
@@ -27,9 +24,6 @@
         ],
         "gate":[
            {"id": "gate-server-1", "host": "10.96.36.181", "clientPort": 3014, "frontend": true}
-        ],
-        "game":[
-            {"id":"game-server-1", "host":"10.96.36.181", "port":8050}
         ],
         "manager":[
             {"id":"manager-server-1", "host":"10.96.36.181", "port":8060}

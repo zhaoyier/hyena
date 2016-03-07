@@ -10,7 +10,7 @@ app.set('name', 'chatofpomelo-websocket');
 app.configure('production|development', function() {
 	// route configures
 	//app.route('chat', routeUtil.chat);
-	app.route('game', routeUtil.gameRoute);
+	//app.route('game', routeUtil.gameRoute);
 
 	// filter configures
 	app.filter(pomelo.timeout());
@@ -36,7 +36,7 @@ app.configure('production|development', 'gate', function(){
 		});
 });
 
-app.configure('production|development', 'connector|game|manager', function() {
+app.configure('production|development', 'connector|manager', function() {
 	require('./app/dao/mongodb/mongodb').init(app, function(error, doc) {
 		app.set('dbclient', doc);
 	})
