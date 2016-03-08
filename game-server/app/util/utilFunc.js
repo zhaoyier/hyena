@@ -55,3 +55,7 @@ handle.getArrayMaxNumber = function(array) {
 	}
 	return _maxNumber;
 }
+
+handle.getTodayDate = function() {
+	return Date.now()/86400000|0;
+}

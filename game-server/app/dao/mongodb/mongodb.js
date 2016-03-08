@@ -52,6 +52,27 @@ function getGameDBCollections(url, collections, cb) {
 					return callback(null);
 				})
 			},
+			game_friend_list: function(callback) {
+				db.collection('game_friend_list', function(error, coll) {
+					if (!error) collections.game_friend_list = coll;
+
+					return callback(null);
+				})
+			},
+			game_friend_apply: function(callback) {
+				db.collection('game_friend_apply', function(error, coll) {
+					if (!error) collections.game_friend_apply = coll;
+
+					return callback(null);
+				})
+			},
+			game_friend_event: function(callback) {
+				db.collection('game_friend_event', function(error, coll) {
+					if (!error) collections.game_friend_event = coll;
+
+					return callback(null);
+				})
+			}
 		}, function(error, doc) {
 			return cb(null);
 		})

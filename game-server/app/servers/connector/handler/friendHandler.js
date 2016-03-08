@@ -1,3 +1,9 @@
+var async = require('async');
+var pomelo = require('pomelo');
+
+var utilFunc = require('../../../util/utilFunc');
+
+
 module.exports = function(app) {
 	return new Handler(app);
 };
@@ -9,33 +15,206 @@ var Handler = function(app) {
 var handler = Handler.prototype;
 
 handler.getFriendList = function(msg, session, next) {
-	return next(null, {code: 200, msg: 'friend'});
+	pomelo.app.get('dbclient').game_friend_list.findOne({_id: session.get('userId')}, function(error, doc) {
+		if (error) {
+			return next(null, {code: 201, msg: error});
+		} else {
+			return next(null, {code: 200, data: doc.friends});
+		}
+	});	
 }
 
-handler.friendApply = function() {
-	return next(null, {code: 200, msg: 'friend'});
+handler.friendApply = function(msg, session, next) {
+	async.series({
+		checkFriend: function(callback) {
+			return callback(null);
+		},
+		checkOnline: function(callback) {
+			return callback(null);
+		},
+		applyFriend: function(callback) {
+			pomelo.app.get('dbclient').game_friend_apply.save({_id: session.get('userId'), friend: msg.friendId, timestamp: Date.now()/1000|0}, function(error, doc) {
+				if (error) return callback(error);
+
+				return callback(null);
+			})
+		}
+	}, function(error, doc) {
+		if (error) {
+			return next(null, {code: 200, msg: 'friend'});
+		} else {
+			return next(null, {code: 200, msg: 'friend'});
+		}
+	})
+	
 }
 
-handler.friendDelete = function () {
-	return next(null, {code: 200, msg: 'friend'});
+handler.friendDelete = function (msg, session, next) {
+	async.series({
+		checkFriend: function(callback) {
+			pomelo.app.get('dbclient').game_friend_list.findOne({_id: session.get('userId'), 'friends._id': msg.friendId}, function(error, doc) {
+				if (error) return callback(error);
+
+				if (!doc) return callback('not friend');
+
+				return callback(null);
+			})
+		},
+		deleteFriend: function(callback) {
+			pomelo.app.get('dbclient').game_friend_list.update({_id: session.get('userId')}, {$pull: {'friends._id': msg.friendId}}, {w:1}, function(error, doc) {
+				if (error) return callback(error);
+
+				return callback(null);
+			})
+		},
+		sendMsg: function(callback) {
+			return callback(null);
+		}
+	}, function(error, doc) {
+		if (error) {
+			return next(null, {code: 201, msg: error});
+		} else {
+			return next(null, {code: 200, msg: 'ok'});
+		}
+	})
 }
 
-handler.friendInspire = function () {
-	return next(null, {code: 200, msg: 'friend'});
+handler.friendInspire = function (msg, session, next) {
+	var _friendObj = null;
+	var _today = utilFunc.getTodayDate();
+
+	async.series({
+		checkFriend: function(callback) {
+			pomelo.app.get('dbclient').game_friend_list.findOne({_id: session.get('userId')}, function(error, doc) {
+				if (error) return callback(null);
+
+				if (!doc) return callback('friend empty');
+
+				for (var i in doc.friends) {
+					if (doc.friends[i]._id == msg.friendId) _friendObj = doc.friends[i];
+				}
+
+				return callback(null);
+			})
+		},
+		inspireFriend: function(callback) {
+			if (!_friendObj) return callback('error friend id or not friend');
+
+			if (!_friendObj.d || _friendObj.d >= _today) return callback('has inspire');
+
+			pomelo.app.get('dbclient').game_friend_list.update({_id: session.get('userId'), 'friends._id': msg.friendId}, {$set: {'friends.$.d': _today}}, {w: 1}, function(error, doc) {
+				if (error) return callback(error);
+
+				return callback(null);
+			})
+		},
+		sendMsg: function(callback) {
+			return callback(null);
+		}
+	}, function(error, doc) {
+		if (error) {
+			return next(null, {code: 201, msg: error});
+		} else {
+			return next(null, {code: 200, msg: 'ok'});
+		}
+	})
 }
 
-handler.friendInspires = function () {
-	return next(null, {code: 200, msg: 'friend'});
+handler.friendInspires = function (msg, session, next) {
+	var _inspireFriend = [], _allFriend = [];
+	var _today = utilFunc.getTodayDate();
+
+	async.series({
+		queryFriend: function(callback) {
+			pomelo.app.get('dbclient').game_friend_list.findOne({_id: session.get('userId')}, function(error, doc) {
+				if (error) return callback(error);
+
+				if (!doc || !doc.friends) return callback('error user id or no friend');
+
+				_allFriend = doc.friends;
+
+				for (var i in doc.friends) {
+					if (doc.friends[i].d < _today) _inspireFriend.push(doc.friends[i]);
+				}
+
+				return callback(null);
+			})
+		},
+		inspireFriend: function(callback) {
+			if (_inspireFriend.length == 0) return callback('no inpire friend');
+
+			for (var i in _allFriend) {
+				if (_allFriend[i].d < _today) _allFriend[i].d = _today;
+			}
+
+			pomelo.app.get('dbclient').game_friend_list.update({_id: session.get('userId')}, {$set: {friends: _allFriend}}, {w: 1}, callback);
+		},
+		sendMsg: function(callback) {
+			return callback(callback);
+		}
+	}, function(error, doc) {
+		if (error) {
+			return next(null, {code: 201, msg: error});
+		} else {
+			return next(null, {code: 200, msg: 'ok'});
+		}
+	})
 }
 
-handler.friendClaim = function () {
-	return next(null, {code: 200, msg: 'friend'});
+handler.friendClaim = function (msg, session, next) {
+	async.series({
+		queryEvent: function(callback) {
+			pomelo.app.get('dbclient').game_friend_event.findOne({_id: session.get('userId'), friend: msg.friendId}, function(error, doc) {
+				if (error) return callback(error);
+
+				return callback(null);
+			})
+		},
+		sendReward: function(callback) {
+			return callback(null);
+		}
+	}, function(error, doc) {
+		if (error) {
+			return next(null, {code: 201, msg: error});
+		} else {
+			return next(null, {code: 200, msg: 'ok'});
+		}
+	})
 }
 
-handler.frindClaims = function () {
-	return next(null, {code: 200, msg: 'friend'});
+handler.frindClaims = function (msg, session, next) {
+	var _temp = [];
+
+	async.series({
+		queryEvent: function(callback) {
+			pomelo.app.get('dbclient').game_friend_event.find({_id: session.get('userId')}).toArray(function(error, doc) {
+				if (error) return callback(error);
+
+				if (!doc) return callback(null);
+
+				for (var i in doc) {
+
+				}
+
+				return callback(null);
+			})
+		},
+		sendReward: function(callback) {
+			async.eachSeries(_temp, function(elem, callfunc) {
+				return callfunc(null);
+			}, function(error, doc) {
+				return callback(null);
+			})
+		}
+	}, function(error, doc){
+		if (error) {
+			return next(null, {code: 201, msg: error});
+		} else {
+			return next(null, {code: 200, msg: 'ok'});
+		}
+	})
 }
 
-handler.friendConfirm = function () {
+handler.friendConfirm = function (msg, session, next) {
 	return next(null, {code: 200, msg: 'friend'});
 }
