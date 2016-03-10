@@ -28,7 +28,7 @@ public class MainScript : MonoBehaviour {
 		JsonObject _jsonObject = new JsonObject ();
 		_jsonObject.Add ("teamType", GameMessage.TeamEnum.A);
 
-		Network.post ("game.gameHandler.joinTeam", _jsonObject, (data)=>{
+		Network.post ("connector.gameHandler.joinTeam", _jsonObject, (data)=>{
 			if (Convert.ToInt32(data["code"]) == 200) _hasSelectRoom = true;
 			Debug.Log("==========>>>2001:\t"+data);
 		});

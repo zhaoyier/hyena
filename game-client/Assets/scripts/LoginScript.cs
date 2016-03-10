@@ -12,10 +12,10 @@ public class LoginScript : MonoBehaviour {
 	private GameObject _loginObject = null;
 	// Use this for initialization
 	void Start () {
-		UIPanel[] _panels = this.gameObject.GetComponentsInChildren<UIPanel> ();
-		Debug.Log("============>>>001:\t"+_panels.Length+"//"+_panels[0].name+"//"+_panels[1].name);
-		_panels [1].gameObject.SetActive (true);
-		_panels [2].gameObject.SetActive (false);
+		//UIPanel[] _panels = this.gameObject.GetComponentsInChildren<UIPanel> ();
+		//Debug.Log("============>>>001:\t"+_panels.Length+"//"+_panels[0].name+"//"+_panels[1].name);
+		//_panels [1].gameObject.SetActive (true);
+		//_panels [2].gameObject.SetActive (false);
 
 		//test ();
 	}

@@ -138,7 +138,7 @@ public class TeamScript : MonoBehaviour {
 
 		UILabel[] _uILable = _childObject.GetComponentsInChildren<UILabel> ();
 		_uILable [0].text = name;
-		_uILable [1].text = (x * y).ToString();
+		//_uILable [1].text = (x * y).ToString();
 	}
 
 	private GameMessage.PositionEnum getPlayerPosition(int selfPosition, int otherPosition) {

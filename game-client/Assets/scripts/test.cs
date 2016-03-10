@@ -14,6 +14,6 @@ public class test : MonoBehaviour {
 	}
 
 	public void OnClieck() {
-		
+		Debug.Log ("===========>>>333");
 	}
 }

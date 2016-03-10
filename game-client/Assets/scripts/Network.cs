@@ -42,6 +42,7 @@ public class Network {
 		_gameClient = new PomeloClient (_gateHost, _gatePort);
 		_gameClient.connect (null, (data)=>{
 			JsonObject msg = new JsonObject();
+			//todo: 从文件导入，作为唯一标示，OR再议唯一
 			msg["uid"] = System.Guid.NewGuid().ToString();
 
 			_gameClient.request("gate.gateHandler.queryEntry", msg, action);
