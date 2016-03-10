@@ -34,33 +34,9 @@ module.exports = {
 		None: 0,
 		Gold: 1,
 		Diamod: 2
-	},//以上有使用
-
-	Team: {
-		PLAYER_ID_NONE: 0,
-		A: 1,
-		B: 2,
-		MAX_PLAYER_NUM: 5,
-	},
-	Device: {
-		DEVICE_NONE: 0,
-		IOS: 1,
-		Android: 2,
-		WP: 3,
-	},
-		
-	Game: {
-		None: 0,
-		Bet: 1,
-		Raise: 2,
-		Fold: 3,
-		Abandon: 4,
-		Check: 5,
-		Compare: 6
-	},
-	ServerStatus: {
-		OK: 200,
-		COMMON_ERROR: 201,
-		RESET_ERROR: 202,
-	}
+	},FriendType: {
+		Apply: 1,
+		Inspire: 2,
+		Delete: 3
+	}//以上有使用
 };

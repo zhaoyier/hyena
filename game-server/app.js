@@ -1,5 +1,7 @@
 var pomelo = require('pomelo');
 var routeUtil = require('./app/util/routeUtil');
+var ChatService = require('./app/services/chatService');
+
 /**
  * Init app for client.
  */
@@ -35,6 +37,11 @@ app.configure('production|development', 'gate', function(){
 			//useProtobuf : true
 		});
 });
+
+// Configure for chat server
+app.configure('production|development', 'chat', function() {
+	app.set('chatService', new ChatService(app));
+})
 
 app.configure('production|development', 'connector|manager', function() {
 	require('./app/dao/mongodb/mongodb').init(app, function(error, doc) {

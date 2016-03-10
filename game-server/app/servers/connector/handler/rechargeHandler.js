@@ -12,6 +12,6 @@ handler.getRechargeList = function (msg, session, next) {
 	return next(null, {code: 200, msg: 'helloword'});
 }
 
-handler.recharge = function (msg, session, next) {
+handler.gameRecharge = function (msg, session, next) {
 	return next(null, {code: 200, msg: 'helloword'});
 }

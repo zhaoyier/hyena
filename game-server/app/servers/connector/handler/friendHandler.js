@@ -1,7 +1,9 @@
 var async = require('async');
 var pomelo = require('pomelo');
 
+
 var utilFunc = require('../../../util/utilFunc');
+var friendType = require('../../../config/consts').FriendType;
 
 
 module.exports = function(app) {
@@ -26,14 +28,34 @@ handler.getFriendList = function(msg, session, next) {
 
 handler.friendApply = function(msg, session, next) {
 	async.series({
-		checkFriend: function(callback) {
-			return callback(null);
+		checkApply: function(callback) {
+			pomelo.app.get('dbclient').game_friend_apply.findOne({userId: session.get('userId'), friend: msg.friendId}, function(error, doc) {
+				if (error) return callback(error);
+
+				if (!doc) return callback('had been apply');
+
+				return callback(null);
+			})
 		},
-		checkOnline: function(callback) {
-			return callback(null);
+		checkFriend: function(callback) {
+			pomelo.app.get('dbclient').game_friend_list.findOne({_id: session.get('userId'), 'friends._id': msg.friendId}, function(error, doc) {
+				if (error) return callback(error);
+
+				if (!doc) return callback('has been friend');
+
+				return callback(null);
+			})
 		},
 		applyFriend: function(callback) {
-			pomelo.app.get('dbclient').game_friend_apply.save({_id: session.get('userId'), friend: msg.friendId, timestamp: Date.now()/1000|0}, function(error, doc) {
+			pomelo.app.get('dbclient').game_friend_apply.save({userId: session.get('userId'), friend: msg.friendId, ct: Date.now()/1000|0}, function(error, doc) {
+				if (error) return callback(error);
+
+				return callback(null);
+			})
+		},
+		sendMsg: function(callback) {
+			var _message = {userId: session.get('userId'), friendId: msg.friendId, ct: Date.now()/1000|0, type: friendType.Apply, status: 0};
+			pomelo.app.get('dbclient').game_friend_event.insert(_message, function(error, doc) {
 				if (error) return callback(error);
 
 				return callback(null);
@@ -68,7 +90,12 @@ handler.friendDelete = function (msg, session, next) {
 			})
 		},
 		sendMsg: function(callback) {
-			return callback(null);
+			var _message = {userId: session.get('userId'), friendId: msg.friendId, ct: Date.now()/1000|0, type: friendType.Delete, status: 0};
+			pomelo.app.get('dbclient').game_friend_event.insert(_message, function(error, doc) {
+				if (error) return callback(error);
+
+				return callback(null);
+			})
 		}
 	}, function(error, doc) {
 		if (error) {
@@ -109,7 +136,12 @@ handler.friendInspire = function (msg, session, next) {
 			})
 		},
 		sendMsg: function(callback) {
-			return callback(null);
+			var _message = {userId: session.get('userId'), friendId: msg.friendId, ct: Date.now()/1000|0, type: friendType.Inspire, status: 0};
+			pomelo.app.get('dbclient').game_friend_event.insert(_message, function(error, doc) {
+				if (error) return callback(error);
+
+				return callback(null);
+			})
 		}
 	}, function(error, doc) {
 		if (error) {
@@ -120,7 +152,7 @@ handler.friendInspire = function (msg, session, next) {
 	})
 }
 
-handler.friendInspires = function (msg, session, next) {
+handler.friendOnekeyInspire = function (msg, session, next) {
 	var _inspireFriend = [], _allFriend = [];
 	var _today = utilFunc.getTodayDate();
 
@@ -150,7 +182,14 @@ handler.friendInspires = function (msg, session, next) {
 			pomelo.app.get('dbclient').game_friend_list.update({_id: session.get('userId')}, {$set: {friends: _allFriend}}, {w: 1}, callback);
 		},
 		sendMsg: function(callback) {
-			return callback(callback);
+			async.eachSeries(_inspireFriend, function(elem, callfunc) {
+				var _message = {userId: session.get('userId'), friendId: elem._id, ct: Date.now()/1000|0, type: friendType.Inspire};
+				pomelo.app.get('dbclient').game_friend_event.insert(_message, function(error, doc) {
+					if (error) return callfunc(error);
+
+					return callfunc(null);
+				});
+			}, callback);
 		}
 	}, function(error, doc) {
 		if (error) {
@@ -164,7 +203,7 @@ handler.friendInspires = function (msg, session, next) {
 handler.friendClaim = function (msg, session, next) {
 	async.series({
 		queryEvent: function(callback) {
-			pomelo.app.get('dbclient').game_friend_event.findOne({_id: session.get('userId'), friend: msg.friendId}, function(error, doc) {
+			pomelo.app.get('dbclient').game_friend_event.findOne({_id: session.get('userId'), friendId: msg.friendId}, function(error, doc) {
 				if (error) return callback(error);
 
 				return callback(null);
@@ -182,7 +221,7 @@ handler.friendClaim = function (msg, session, next) {
 	})
 }
 
-handler.frindClaims = function (msg, session, next) {
+handler.frindOnekeyClaim = function (msg, session, next) {
 	var _temp = [];
 
 	async.series({

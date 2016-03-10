@@ -1,5 +1,5 @@
 //var utils = require('../../../util/utils');
-var teamManager = require('../../../services/teamManager');
+var teamService = require('../../../services/teamService');
 
 module.exports = function(){
 	return new TeamRemote();
@@ -13,7 +13,7 @@ var TeamRemote = function(){
 * @param: 
 * */
 TeamRemote.prototype.applyJoinTeam = function(args, callfunc) {
-	teamManager.applyJoinTeam(args, function(error, doc) {
+	teamService.applyJoinTeam(args, function(error, doc) {
 		return callfunc(error, doc);
 	})
 }
@@ -22,7 +22,7 @@ TeamRemote.prototype.applyJoinTeam = function(args, callfunc) {
 * @param: 
 * */
 TeamRemote.prototype.applyPrepareGame = function(data, callfunc) {
-	teamManager.applyPrepareGame(data, function(error, doc) {
+	teamService.applyPrepareGame(data, function(error, doc) {
 		return callfunc(error, doc);
 	})
 }
@@ -31,7 +31,7 @@ TeamRemote.prototype.applyPrepareGame = function(data, callfunc) {
 * @param: 
 * */
 TeamRemote.prototype.applyStartGame = function(data, callfunc) {
-	teamManager.applyStartGame(data, function(error, doc) {
+	teamService.applyStartGame(data, function(error, doc) {
 		return callfunc(error, doc);
 	})
 }
@@ -40,7 +40,7 @@ TeamRemote.prototype.applyStartGame = function(data, callfunc) {
 * @param: 
 * */
 TeamRemote.prototype.applyBetGame = function(data, callfunc) {
-	teamManager.applyBetGame(data, function(error, doc) {
+	teamService.applyBetGame(data, function(error, doc) {
 		return callfunc(error, doc);
 	})
 }
@@ -56,7 +56,7 @@ TeamRemote.prototype.applyBetGame = function(data, callfunc) {
 * @param: 
 * */
 TeamRemote.prototype.applyCheckGame = function(data, callfunc) {
-	teamManager.applyCheckGame(data, function(error, doc) {
+	teamService.applyCheckGame(data, function(error, doc) {
 		return callfunc(error, doc);
 	})
 }
@@ -65,7 +65,7 @@ TeamRemote.prototype.applyCheckGame = function(data, callfunc) {
 * @param: 
 * */
 TeamRemote.prototype.applyAbandonGame = function(data, callfunc) {
-	teamManager.applyAbandonGame(data, function(error, doc) {
+	teamService.applyAbandonGame(data, function(error, doc) {
 		return callfunc(error, doc);
 	})
 }
@@ -74,7 +74,7 @@ TeamRemote.prototype.applyAbandonGame = function(data, callfunc) {
 * @param: 
 * */
 TeamRemote.prototype.applyLeaveGame = function(data, callfunc) {
-	teamManager.applyLeaveGame(data, function(error, doc) {
+	teamService.applyLeaveGame(data, function(error, doc) {
 		return callfunc(error, doc);
 	})
 }
@@ -83,7 +83,7 @@ TeamRemote.prototype.applyLeaveGame = function(data, callfunc) {
 * @param: 
 * */
 TeamRemote.prototype.applyCompareGame = function(data, callfunc) {
-	teamManager.applyCompareGame(data, function(error, doc) {
+	teamService.applyCompareGame(data, function(error, doc) {
 		return callfunc(error, doc);
 	})
 }
@@ -92,7 +92,7 @@ TeamRemote.prototype.applyCompareGame = function(data, callfunc) {
 * @param: 
 * */
 // TeamRemote.prototype.applyClearGame = function(data, callfunc) {
-// 	teamManager.applyClearGame(data, function(error, doc) {
+// teamService.applyClearGame(data, function(error, doc) {
 // 		return callfunc(error, doc);
 // 	})
 // }
@@ -101,7 +101,7 @@ TeamRemote.prototype.applyCompareGame = function(data, callfunc) {
 * @param: 
 * */
 TeamRemote.prototype.applyChangeGame = function(data, callfunc) {
-	teamManager.applyChangeGame(data, function(error, doc) {
+	teamService.applyChangeGame(data, function(error, doc) {
 		return callfunc(error, doc);
 	})
 }
