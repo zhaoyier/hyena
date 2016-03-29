@@ -59,7 +59,7 @@ handler.login = function(msg, session, next) {
 		},
 		syncToChat: function(callback) {
 			_self.app.rpc.chat.chatRemote.add(session, _rtnData.userId, msg.username, channelUtil.getGlobalChannelName(), msg.serverId, callback);
-			return callback(null);
+			//return callback(null);
 		}
 	}, function(error, doc) {
 		if (error) {
@@ -113,6 +113,10 @@ handler.register = function (msg, session, next) {
 		}
 		
 	})
+}
+
+handler.forget = function (msg, session, next) {
+	return next(null, {code: 200});
 }
 
 /**

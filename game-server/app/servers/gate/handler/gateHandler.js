@@ -26,5 +26,5 @@ handler.queryEntry = function(msg, session, next) {
 	}
 
 	var _connector = dispatcher.randomDispatch(_connectors);
-	return next(null, {code: 200, host: _connector.host, port: _connector.clientPort});
+	return next(null, {code: 200, host: _connector.host, port: _connector.clientPort, serverId: _connector.id});
 };
